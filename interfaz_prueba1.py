@@ -1,4 +1,3 @@
-
 #Libraries
 from tkinter import *
 from tkinter.ttk import *
@@ -27,13 +26,14 @@ coordinate_y = (screen_height/2) - (height_window/2)
 
 
 #Class of root window
-class My_window(Frame):
+class Win1(Frame):
     #Elements of the window
     # NUM_TOPIC = Spinbox()    #Spinbox for selct the topic number 
     eventButton = Button()
     exitButton = Button()
     goButton = Button()
     TopicListButton = Button()
+    win3button = Button()
 
     #Showing names option
     CheckVar = IntVar()
@@ -64,61 +64,6 @@ class My_window(Frame):
     #Exit of the app
     def Exit(self):
         exit()
-        return
-
-
-    def butnew(self, text, _class):
-
-        self.goButton.config(text = text,command = lambda: self.new_window(_class))
-
-        self.goButton.grid(row = 5, column = 2)
-
-        return
-
-
-    # def Error_window(self):
-
-    #     self.new = Toplevel(self.master)
-        
-    #     self.new.geometry("250x100")
-
-    #     lbl_error= Label(self.new, text="Please Select a Topic Number!")
-    #     lbl_error.grid(row=0,column=0, padx=30,pady=20)
-
-    #     return
-
-
-    def new_window(self,_class):
-
-        # num_topic = self.NUM_TOPIC.get()
-        editable_names = self.CheckVar.get()
-        root.filename =  filedialog.askdirectory()
-        url_list = root.filename.split('/')
-        folder_name = url_list[-1]
-        print(folder_name)
-
-        file_all_topics = open("C:/Users/Pedro/Desktop/TFG/b/gt/all_topics.txt","r")
-
-        for i in range(0, 135):
-
-            line = file_all_topics.readline()            
-            list_line = line.split()
-
-            if(list_line[1] == folder_name):
-                num_topic = list_line[0]
-        
-        
-
-
-        # if(num_topic==''):
-        #     self.Error_window()
-        # else:
-        self.new = Toplevel(self.master)
-        # self.new.attributes('-fullscreen',True)
-        self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
-        # self.new.geometry("640x640")
-        _class(self.new, num_topic ,editable_names,root.filename)
-
         return
 
 
@@ -153,33 +98,31 @@ class My_window(Frame):
         self.labl9.config(text="     ")
         self.labl9.grid(row=4,column=1)
 
-        # self.labl10.config(text="    ")
-        # self.labl10.grid(row=4,column=2)
-
-
-        # self.label_spin.config(text="Choose the topic (1 to 135)")
-        # self.label_spin.grid(row=3,column=3)
-
-        #spinbox to select number of clusters
-        # self.NUM_TOPIC.config(from_=1, to=135)
-        # self.NUM_TOPIC.grid(row=4,column=3)
-
-        self.butnew("Choose Folder ", Win2)
 
         #topic list button
-        self.TopicListButton.config(text="Topic List", command=self.TopicList)
+        self.TopicListButton.config(text="Check Evaluations", command=self.TopicList)
         self.TopicListButton.grid(row=5, column=3)
 
         #Exit Button
         self.exitButton.config(text="Exit", command= self.Exit)
         self.exitButton.grid(row = 5, column = 4)
 
-
-        self.NamesCheckButton.config(text="Editable Names", variable=self.CheckVar, onvalue=1, offvalue=0)
-        self.NamesCheckButton.grid(row=4,column=2)
+        self.win3button.config(text="Check Results",command=self.ResultsWindow)
+        self.win3button.grid(row = 5, column = 2)
 
         return
 
+    def ResultsWindow(self):
+
+        new_frame = Toplevel(self.master)
+        new_frame.title("Results Window")
+        new_frame.geometry("350x200")
+        new_frame.grid()
+        Win3(new_frame)
+
+
+        return
+        
 
     def TopicList(self):
 
@@ -225,7 +168,6 @@ class My_window(Frame):
 ##-- End of the class My_windows --##
 
 
-#First Window Panel
 class Win2():
 
 
@@ -679,7 +621,165 @@ class Win2():
         return str1
 
 
+class Win3():
+
+    eventButton = Button()
+    TopicListButton = Button()
+
+    #Showing names option
+    CheckVar = IntVar()
+    
+
+    def __init__(self, master):
+
+        self.master = master
+        self.frame2 = tk.Frame(self.master)
+        self.PutWidgets()  
+
+        return
+
+
+    def PutWidgets(self):        
+        
+        btt_prove = Button(self.master,text="Pulsame")
+        btt_prove.grid(row = 0, column = 0)
+
+
+        #labels for help to construct the interface
+        labl1 = Label(self.master,text="      ")
+        labl1.grid(row=0,column=1)
+
+        labl2 = Label(self.master,text="      ")
+        labl2.grid(row=0,column=2)
+
+        labl3 = Label(self.master,text="      ")
+        labl3.grid(row=1,column=1)
+
+        labl4 = Label(self.master,text="      ")
+        labl4.grid(row=1,column=2)
+
+        labl5 = Label(self.master,text="      ")
+        labl5 = Label(self.master,text="      ")
+
+        labl6 = Label(self.master,text="      ")
+        labl6.grid(row=2,column=2)
+
+        labl7 = Label(self.master,text="      ")
+        labl7.grid(row=2,column=0)
+
+        # self.labl8.config(text="    ")
+        # self.labl8.grid(row=5,column=1)
+
+        labl9 = Label(self.master,text="      ")
+        labl9.grid(row=4,column=1)
+
+
+        self.butnew("Choose Folder ", Win2)
+
+        #topic list button
+        TopicListButton = Button(self.master,text="Topic List", command=self.TopicList)
+        TopicListButton.grid(row=5, column=3)
+
+        ExitButton = Button(self.master, text="Close", command = self.CloseWindow)
+        ExitButton.grid(row=5, column=4)
+
+
+        NamesCheckButton = Checkbutton(self.master,text="Editable Names", variable=self.CheckVar, onvalue=1, offvalue=0)
+        NamesCheckButton.grid(row=4,column=2)
+
+
+        return
+
+    def butnew(self, text, _class):
+
+        self.goButton = Button(self.master, text = text,command = lambda: self.new_window(_class))
+
+        self.goButton.grid(row = 5, column = 2)
+
+        return
+
+
+    def new_window(self,_class):
+
+        # num_topic = self.NUM_TOPIC.get()
+        editable_names = self.CheckVar.get()
+        root.filename =  filedialog.askdirectory()
+        url_list = root.filename.split('/')
+        folder_name = url_list[-1]
+        print(folder_name)
+
+        file_all_topics = open("C:/Users/Pedro/Desktop/TFG/b/gt/all_topics.txt","r")
+
+        for i in range(0, 135):
+
+            line = file_all_topics.readline()            
+            list_line = line.split()
+
+            if(list_line[1] == folder_name):
+                num_topic = list_line[0]
+        
+        
+
+
+        # if(num_topic==''):
+        #     self.Error_window()
+        # else:
+        self.new = Toplevel(self.master)
+        # self.new.attributes('-fullscreen',True)
+        self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
+        # self.new.geometry("640x640")
+        _class(self.new, num_topic ,editable_names,root.filename)
+
+        return
+
+
+    def CloseWindow(self):
+        self.master.destroy()
+        return
+
+    def TopicList(self):
+
+        self.new = Toplevel(self.master)
+        
+        self.new.geometry("500x640")
+
+        self.new.title("Topic List")
+
+        self.new.grid()
+        
+        frame_canvas = Frame(self.new)
+        frame_canvas.grid(row=0,column=0,columnspan=3)
+
+        canvas = Canvas(frame_canvas, width=480, height=640,bg='green')
+        canvas.grid(row=0,column=0)
+
+        scrollbar = Scrollbar(frame_canvas,orient="vertical",command=canvas.yview)       
+        scrollbar.grid(row=0, column=1, sticky='ns')
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        frame_labels = Frame(canvas)
+        canvas.create_window(0,0,window=frame_labels, anchor='nw')
+
+        file_topics_numbers = open("C:/Users/Pedro/Desktop/TFG/b/gt/all_topics.txt","r")
+
+        for i in range(0, 135):
+
+            line = file_topics_numbers.readline()            
+            list_line = line.split()
+            lbl = Label(frame_labels, text="Topic"+str(i + 1) + ": "+ list_line[1])
+            lbl.grid(row=i, column=0)
+
+
+        frame_labels.update_idletasks()
+
+        canvas.config(scrollregion=canvas.bbox("all"))
+
+
+        return
+
+
 root.geometry("%dx%d+%d+%d" % (width_window,height_window,coordinate_x,coordinate_y))
 
-app = My_window(root)
+app = Win1(root)
 app.mainloop()
