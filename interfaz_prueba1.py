@@ -1,6 +1,3 @@
-## First design of the application
-
-##EXPLORADOR DE ARCHIVOS
 
 #Libraries
 from tkinter import *
@@ -11,6 +8,7 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
+from tkinter import filedialog
 
 
 ###---GLOBAL VARIABLES---###
@@ -31,7 +29,7 @@ coordinate_y = (screen_height/2) - (height_window/2)
 #Class of root window
 class My_window(Frame):
     #Elements of the window
-    NUM_TOPIC = Spinbox()    #Spinbox for selct the topic number 
+    # NUM_TOPIC = Spinbox()    #Spinbox for selct the topic number 
     eventButton = Button()
     exitButton = Button()
     goButton = Button()
@@ -78,31 +76,48 @@ class My_window(Frame):
         return
 
 
-    def Error_window(self):
+    # def Error_window(self):
 
-        self.new = Toplevel(self.master)
+    #     self.new = Toplevel(self.master)
         
-        self.new.geometry("250x100")
+    #     self.new.geometry("250x100")
 
-        lbl_error= Label(self.new, text="Please Select a Topic Number!")
-        lbl_error.grid(row=0,column=0, padx=30,pady=20)
+    #     lbl_error= Label(self.new, text="Please Select a Topic Number!")
+    #     lbl_error.grid(row=0,column=0, padx=30,pady=20)
 
-        return
+    #     return
 
 
     def new_window(self,_class):
 
-        num_topic = self.NUM_TOPIC.get()
+        # num_topic = self.NUM_TOPIC.get()
         editable_names = self.CheckVar.get()
+        root.filename =  filedialog.askdirectory()
+        url_list = root.filename.split('/')
+        folder_name = url_list[-1]
+        print(folder_name)
 
-        if(num_topic==''):
-            self.Error_window()
-        else:
-            self.new = Toplevel(self.master)
-            # self.new.attributes('-fullscreen',True)
-            self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
-            # self.new.geometry("640x640")
-            _class(self.new, num_topic,editable_names)
+        file_all_topics = open("C:/Users/Pedro/Desktop/TFG/b/gt/all_topics.txt","r")
+
+        for i in range(0, 135):
+
+            line = file_all_topics.readline()            
+            list_line = line.split()
+
+            if(list_line[1] == folder_name):
+                num_topic = list_line[0]
+        
+        
+
+
+        # if(num_topic==''):
+        #     self.Error_window()
+        # else:
+        self.new = Toplevel(self.master)
+        # self.new.attributes('-fullscreen',True)
+        self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
+        # self.new.geometry("640x640")
+        _class(self.new, num_topic ,editable_names,root.filename)
 
         return
 
@@ -142,14 +157,14 @@ class My_window(Frame):
         # self.labl10.grid(row=4,column=2)
 
 
-        self.label_spin.config(text="Choose the topic (1 to 135)")
-        self.label_spin.grid(row=3,column=3)
+        # self.label_spin.config(text="Choose the topic (1 to 135)")
+        # self.label_spin.grid(row=3,column=3)
 
         #spinbox to select number of clusters
-        self.NUM_TOPIC.config(from_=1, to=135)
-        self.NUM_TOPIC.grid(row=4,column=3)
+        # self.NUM_TOPIC.config(from_=1, to=135)
+        # self.NUM_TOPIC.grid(row=4,column=3)
 
-        self.butnew("Start", Win2)
+        self.butnew("Choose Folder ", Win2)
 
         #topic list button
         self.TopicListButton.config(text="Topic List", command=self.TopicList)
@@ -214,7 +229,7 @@ class My_window(Frame):
 class Win2():
 
 
-    def __init__(self, master, num_topic,editable_names):
+    def __init__(self, master, num_topic,editable_names,folder_topic):
 
         self.master = master
         self.frame = tk.Frame(self.master)
@@ -228,7 +243,7 @@ class Win2():
                         'mediumaquamarine', 'turquoise', 'paleturquoise', 'darkcyan','aqua','deepskyblue', 'steelblue', 
                         'dodgerblue', 'blueviolet','magenta', 'mediumvioletred',  'hotpink', 'crimson', 'pink']
 
-        images_vector_url = self.Reading_folder_images(num_topic)
+        images_vector_url = self.Reading_folder_images(num_topic,folder_topic)
         images_vector_jpg =  self.ResizePhotos(images_vector_url)
 
         name_topic = self.FrameUP(num_topic,Color_List)
@@ -277,14 +292,14 @@ class Win2():
         return list_photo_type
 
 
-    def Reading_folder_images(self,num_topic):
+    def Reading_folder_images(self,num_topic,folder_topic):
 
         self.a = "a\Hola"
         self.b = self.a[1]
         self.image_list = [] #images in PIL.JpegImagePlugin.JpegImageFile data type
         self.image_url = [] #images in str data type: url of the image in this computer
 
-        for filename in glob.glob("C:/Users/Pedro/Desktop/TFG/Imagenes_TFG/topic"+num_topic+"/topic"+num_topic+"/*.jpg"):
+        for filename in glob.glob(folder_topic+"/*.jpg"):
             im=Image.open(filename)
             self.A = list(filename)
             i = 0
