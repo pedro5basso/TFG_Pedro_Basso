@@ -27,34 +27,9 @@ coordinate_x = (screen_width/2) - (width_window/2)
 coordinate_y = (screen_height/2) - (height_window/2)
 
 
-#Class of root window
+# Class 1: Win2 
 class Win1(Frame):
-    #Elements of the window
-    # NUM_TOPIC = Spinbox()    #Spinbox for selct the topic number 
-    eventButton = Button()
-    exitButton = Button()
-    goButton = Button()
-    TopicListButton = Button()
-    win3button = Button()
 
-    #Showing names option
-    CheckVar = IntVar()
-    NamesCheckButton = Checkbutton()
-
-    #Labels of the window
-    labelAlgorithm = Label()    #label for the algorithms
-    label_spin = Label()        #label for the number of clusters
-
-    labl1 = Label()             #empty label helping to build the interface
-    labl2 = Label()             #empty label helping to build the interface
-    labl3 = Label()             #empty label helping to build the interface
-    labl4 = Label()             #empty label helping to build the interface
-    labl5 = Label()             #empty label helping to build the interface
-    labl6 = Label()             #empty label helping to build the interface
-    labl7 = Label()             #empty label helping to build the interface
-    labl8 = Label()             #empty label helping to build the interface
-    labl9 = Label()             #empty label helping to build the interface
-    labl10 = Label()            #empty label helping to build the interface
 
     def __init__(self, parent):
         Frame.__init__(self,parent)
@@ -63,54 +38,52 @@ class Win1(Frame):
         self.PutWidgets()
         return
 
-    #Exit of the app
     def Exit(self):
         exit()
         return
 
-
-    #init and put the widgets in the root window
     def PutWidgets(self):
         
-        #labels for help to construct the interface
-        self.labl1.config(text="      ")
-        self.labl1.grid(row=0,column=1)
+        #Empty labels for help to construct the interface:
 
-        self.labl2.config(text="      ")
-        self.labl2.grid(row=0,column=2)
+        lbl1 = Label(self.parent,text="      ")
+        lbl1.grid(row=0,column=1)
 
-        self.labl3.config(text="      ")
-        self.labl3.grid(row=1,column=1)
+        lbl2 = Label(self.parent,text="      ")
+        lbl2.grid(row=0,column=2)
 
-        self.labl4.config(text="      ")
-        self.labl4.grid(row=1,column=2)
+        lbl3 = Label(self.parent,text="      ")
+        lbl3.grid(row=1,column=1)
 
-        self.labl5.config(text="      ")
-        self.labl5.grid(row=2,column=1)
+        lbl4 = Label(self.parent,text="      ")
+        lbl4.grid(row=1,column=2)
 
-        self.labl6.config(text="      ")
-        self.labl6.grid(row=2,column=2)
+        lbl5 = Label(self.parent,text="      ")
+        lbl5.grid(row=2,column=1)
 
-        self.labl7.config(text="      ")
-        self.labl7.grid(row=2,column=0)
+        lbl6 = Label(self.parent,text="      ")
+        lbl6.grid(row=2,column=2)
 
-        # self.labl8.config(text="    ")
-        # self.labl8.grid(row=5,column=1)
+        lbl7 = Label(self.parent,text="      ")
+        lbl7.grid(row=2,column=0)
 
-        self.labl9.config(text="     ")
-        self.labl9.grid(row=4,column=1)
+        lbl8 = Label(self.parent,text="     ")
+        lbl8.grid(row=4,column=1)
 
 
-        #topic list button
-        self.TopicListButton.config(text="Check Evaluations", command=self.EvalWindow)
-        self.TopicListButton.grid(row=5, column=3)
+        # Check Results Button
+        bttResults = Button(self.parent,text="Check Results",command=self.ResultsWindow)
+        bttResults.grid(row = 5, column = 2)
 
-        #Exit Button
-        self.exitButton.config(text="Exit", command= self.Exit)
-        self.exitButton.grid(row = 5, column = 4)
+        # Check Evaluations Button
+        bttEvaluations = Button(self.parent,text="Check Evaluations", command=self.EvalWindow)
+        bttEvaluations.grid(row=5, column=3)
 
-        self.win3button.config(text="Check Results",command=self.ResultsWindow)
-        self.win3button.grid(row = 5, column = 2)
+        # Exit Button
+        bttExit = Button(self.parent,text="Exit", command= self.Exit)
+        bttExit.grid(row = 5, column = 4)
+
+        
 
         return
 
@@ -136,9 +109,11 @@ class Win1(Frame):
 
         return
 
-##-- End of the class My_windows --##
+##-- End of Class 1: Win1 --##
 
+# ------------------------------------------
 
+# Class 2: Win2 
 class Win2():
 
 
@@ -212,10 +187,13 @@ class Win2():
         self.image_list = [] #images in PIL.JpegImagePlugin.JpegImageFile data type
         self.image_url = [] #images in str data type: url of the image in this computer
 
+
         for filename in glob.glob(folder_topic+"/*.jpg"):
             im=Image.open(filename)
             self.A = list(filename)
+            
             i = 0
+            
             for c in filename:
                 if (c == self.b):
                     self.A[i] = '/'
@@ -224,6 +202,8 @@ class Win2():
             self.image_url_def = self.listToString(self.A)
             self.image_url.append(self.image_url_def)
             self.image_list.append(ImageTk.PhotoImage(Image.open(self.image_url_def)))
+
+        
 
         return (self.image_url)
 
@@ -285,11 +265,8 @@ class Win2():
         
 
         #Read dGT file
-        list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic,fotos_num)
+        list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic)
 
-
-        #Read dclster GT file
-        list_cluster_in_topic = self.ReadDclusterGT(num_topic,name_topic)
 
 
         for i in range (1, rows):
@@ -310,7 +287,7 @@ class Win2():
                     canvas_grid[i][j].grid(row=0, column=0, columnspan=3)
 
                     self.pack = self.images_vector_jpg[_num_fotos-1]
-                    self.img_type = self.pack[1] #ype of the image (size)
+                    self.img_type = self.pack[1] #type of the image (size)
                     self.image = self.pack[0]
 
 
@@ -348,13 +325,12 @@ class Win2():
                     if(list_similarity[_num_fotos - 1] != '1'): #because in some folders there are '-1' instead of 0
 
                         canvas_grid[i][j].config(bg='white')            
-                          
+                            
                         bckgrnd_lbl = 'red'
                         _lbl_number.config(bg=bckgrnd_lbl)
 
                         _lbl_cluster.config(text="No Cluster", bg='black', fg='white')
-                        
-                        
+
                     else:                  
                     
                         #Background for the image                        
@@ -486,7 +462,7 @@ class Win2():
         return (list_cluster_topic)
 
 
-    def ReadDGTFile(self,num_topic,name_topic,number_objects):
+    def ReadDGTFile(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70): #the file is in devset folder
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dGt.txt"
@@ -591,7 +567,11 @@ class Win2():
         # return string   
         return str1
 
+##-- End of Class 2: Win2 --##
 
+# ------------------------------------------
+
+# Class 3: Win3 
 class Win3():
 
     eventButton = Button()
@@ -645,7 +625,10 @@ class Win3():
         labl9.grid(row=4,column=1)
 
 
-        self.butnew("Choose Folder ", Win2)
+       
+        goButton = Button(self.master, text = "Choose Folder ",command = self.ResultsWindow)
+        goButton.grid(row = 5, column = 2)
+
 
         #topic list button
         TopicListButton = Button(self.master,text="Topic List", command=self.TopicList)
@@ -661,16 +644,8 @@ class Win3():
 
         return
 
-    def butnew(self, text, _class):
 
-        self.goButton = Button(self.master, text = text,command = lambda: self.new_window(_class))
-
-        self.goButton.grid(row = 5, column = 2)
-
-        return
-
-
-    def new_window(self,_class):
+    def ResultsWindow(self):
 
         # num_topic = self.NUM_TOPIC.get()
         editable_names = self.CheckVar.get()
@@ -701,7 +676,7 @@ class Win3():
             # self.new.attributes('-fullscreen',True)
             self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
             # self.new.geometry("640x640")
-            _class(self.new, num_topic ,editable_names,root.filename)
+            Win2(self.new, num_topic ,editable_names,root.filename)
         else:
             print('Choose a folder!')
 
@@ -711,6 +686,7 @@ class Win3():
     def CloseWindow(self):
         self.master.destroy()
         return
+
 
     def TopicList(self):
 
@@ -753,8 +729,11 @@ class Win3():
 
         return
 
+##-- End of Class 3: Win3 --##
 
+# ------------------------------------------
 
+# Class 4: Win4 
 class Win4():
 
     def __init__(self, master):
@@ -767,11 +746,23 @@ class Win4():
 
 
     def PutWidgets(self):
+
+        lbl_title_results = Label(self.master, text="Results File")
+        lbl_title_results.grid(row=0,column=0)
         
-        self.butnew("Select the file", Win5)
+        btt_selesct_file = Button(self.master, text="Select the Results file",command = self.CheckResultwindow)
+        btt_selesct_file.grid(row=1,column=0)
+
 
         btt_close_window = Button(self.master, text="Close", command=self.CloseWindow)
-        btt_close_window.grid(row=0,column=1)
+        btt_close_window.grid(row=1,column=1)
+
+
+        lbl_title_clusters = Label(self.master, text="Clusters File")
+        lbl_title_clusters.grid(row=2,column=0)
+
+        btt_clusters = Button(self.master, text="Select the Clusters file", command=self.CheckClustersWindow)
+        btt_clusters.grid(row=3, column=0)
 
 
     def CloseWindow(self):
@@ -781,18 +772,10 @@ class Win4():
         return
 
 
-    def butnew(self, text, _class):
-
-        btt_selesct_file = Button(self.master, text=text,command = lambda: self.new_window(_class))
-        btt_selesct_file.grid(row=0,column=0)
-
-        return
+    def CheckResultwindow(self):
 
 
-    def new_window(self,_class):
-
-
-        root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = ((".txt files","*.txt"),("all files","*.*")))
+        root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select Results file",filetypes = ((".txt files","*.txt"),("all files","*.*")))
         url_list = root.filename.split('/')
         file_txt_name = url_list[-1]
         # print(file_txt_name)
@@ -803,13 +786,30 @@ class Win4():
             self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
             # self.new.geometry("640x640")
             self.new.grid()
-            _class(self.new,file_txt_name,root.filename)
+            Win5(self.new,file_txt_name,root.filename)
         else:
             print('Choose a folder!')
 
         return
 
 
+    def CheckClustersWindow(self):
+
+
+        root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select Cluster file",filetypes = ((".txt files","*.txt"),("all files","*.*")))
+        url_list = root.filename.split('/')
+        file_txt_name = url_list[-1]
+        self.new = Toplevel(self.master)
+        self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
+        # self.new.geometry("640x640")
+        self.new.grid()
+        Win6(self.new,file_txt_name,root.filename)
+
+##-- End of Class 4: Win4 --##
+
+# ------------------------------------------
+
+# Class 5: Win5
 class Win5():
 
     def __init__(self, master,filename,path_filename):
@@ -907,7 +907,7 @@ class Win5():
         # resize de las imagenes:
         list_resized_photos =  self.ResizePhotos(list_50_images)
 
-        self.MakeBotFrame(num_topic, name_topic, list_50_images,list_resized_photos,result_list)
+        self.MakeBotFrame(num_topic, name_topic,list_resized_photos,result_list)
 
 
         return
@@ -932,7 +932,7 @@ class Win5():
         return(list_images_50)
 
 
-    def MakeBotFrame(self,num_topic, name_topic, list_images_topic,list_resized_photos,result_list):
+    def MakeBotFrame(self,num_topic, name_topic,list_resized_photos,result_list):
 
 
         #Frame para el canvas
@@ -953,7 +953,7 @@ class Win5():
 
 
         # #Grid for the photos
-        # #Every Folder has 300 photos, so we make a 60x5 grid
+        
         rows = 11
         columns = 6
 
@@ -961,7 +961,7 @@ class Win5():
         canvas_grid = [[Canvas() for j in range(columns)] for i in range(rows)]
 
         _num_fotos = 0#contador para las fotos
-        fotos_num = len(list_images_topic)
+        fotos_num = len(list_resized_photos)
 
         self.images_vector_jpg = list_resized_photos
 
@@ -976,8 +976,6 @@ class Win5():
                 frames_grid[i][j].grid(row=i, column=j, sticky='n')
 
                 if(_num_fotos <= fotos_num):
-
-                    url_image = self.ExtractPhoto_fromUrl(list_images_topic[_num_fotos - 1])
 
                     canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300,bg='white')
                     canvas_grid[i][j].grid(row=0, column=0, columnspan=3)
@@ -999,17 +997,13 @@ class Win5():
                         
                         canvas_grid[i][j].create_image(0,0, image=self.image, anchor='nw')
 
-                    _lbl_number = tk.Label(frames_grid[i][j], text="IMAGE ID: " + url_image)
+                    
+                    _pack_name = result_list[_num_fotos - 1]
+                    _name = _pack_name[1]
+
+                    _lbl_number = tk.Label(frames_grid[i][j], text="IMAGE ID: " + _name)
                     _lbl_number.grid(row=1, column=0, sticky='s')
 
-
-                    # if(editable_names == 1):#True (Show photonames editable)
-
-                    #     _photo_name = tk.Text(frames_grid[i][j], width=15, height=5)
-                    #     _photo_name.grid(row=1, column=1, sticky='w')
-                    #     _photo_name.insert(tk.END,url_image)
-
-                    # else:
 
                     _pack_sim = result_list[_num_fotos - 1]
                     sim_image = _pack_sim[2]
@@ -1021,27 +1015,7 @@ class Win5():
                     _lbl_cluster = tk.Label(frames_grid[i][j])
                     _lbl_cluster.grid(row=1, column=2, sticky='w')
 
-                    # if(list_similarity[_num_fotos - 1] != '1'): #because in some folders there are '-1' instead of 0
 
-                    #     canvas_grid[i][j].config(bg='white')            
-                          
-                    #     bckgrnd_lbl = 'red'
-                    #     _lbl_number.config(bg=bckgrnd_lbl)
-
-                    #     _lbl_cluster.config(text="No Cluster", bg='black', fg='white')
-                        
-                        
-                    # else:                  
-                    
-                        #Background for the image                        
-                        # color_bckgrn,number_cluster = self.SetColorCluster(url_image,list_clus_belong_photos,Color_List)
-                        # canvas_grid[i][j].config(bg=color_bckgrn)
-
-                        # bckgrnd_lbl = 'green'
-                        # _lbl_number.config(bg=bckgrnd_lbl)
-
-                        # _lbl_cluster = tk.Label(frames_grid[i][j], text="Cluster "+str(number_cluster) + list_cluster_in_topic[int(number_cluster) - 1])
-                        # _lbl_cluster.config( text="Cluster "+str(number_cluster), bg=color_bckgrn)
 
 
                 else:
@@ -1110,16 +1084,6 @@ class Win5():
         return(num_topic)
 
 
-    def ExtractPhoto_fromUrl(self,url):
-
-            url_list = url.split('/')
-            img_with_jpg = url_list[-1]
-            aux = img_with_jpg.split('.')
-            img_ = aux[0]
-
-            return (img_)
-
-
     def NameTopic(self, num_topic):
 
         file_topics_numbers = open("C:/Users/Pedro/Desktop/TFG/b/gt/all_topics.txt","r")
@@ -1178,8 +1142,110 @@ class Win5():
 
         return list_photo_type
 
+##-- End of Class 5: Win5 --##
 
-# ------------------------------
+# ------------------------------------------
+
+# Class 6: Win6
+class Win6():
+
+    def __init__(self, master,file_txt_name,file_path):
+
+        self.master = master
+        self.frame = tk.Frame(self.master)
+
+        name_topic,num_topic = self.Extract_Name_Number_Topic(file_txt_name)
+        
+        list_clus_belong_photos = self.ReadClustersFile(file_path)
+        
+        list_clus_belong_real_photos = self.ReadDGTFile(name_topic,num_topic,file_path)
+
+        # list_resized_photos =  self.ResizePhotos(list_clus_belong_real_photos,name_topic)
+
+        # self.SetImagesClusterFile(name_topic,list_clus_belong_photos,list_resized_photos)
+        
+
+        
+        return
+    
+
+    def ReadClustersFile(self,file_path):
+
+        # print(file_path)
+        # print(type(file_path))
+
+        cluster_file = open(file_path, 'r')
+
+        list_clus_belong_photos = []
+
+        count = 0
+        with open(file_path, 'r') as f:
+            for line in f:
+                count += 1.
+
+        #Read the first line, that is text
+        line = cluster_file.readline()
+
+        for i in range(0, int(count) - 1):
+
+            line = cluster_file.readline()
+            list_line = line.split('\t')
+            # print(list_line)
+            photo_id = list_line[0]
+            cluster_number = list_line[1]
+            def_list = [photo_id, cluster_number]    
+            list_clus_belong_photos.append(def_list)
+
+        cluster_file.close()
+
+        return (list_clus_belong_photos)
+
+
+    def Extract_Name_Number_Topic(self,file_txt_name):
+
+
+        list_name_file = file_txt_name.split('-')
+        num_topic = list_name_file[0]
+        name_topic = list_name_file[1]
+
+
+        return (name_topic, num_topic)
+
+
+    def ReadDGTFile(self,name_topic,num_topic,file_path):
+
+
+        if(int(num_topic) <= 70): #the file is in devset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dGt.txt"
+        else:#the file is in testset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dGt.txt"
+
+        dGT_file = open(filename, 'r')
+
+        list_clus_belong_photos = []
+
+        count = 0
+        with open(filename, 'r') as f:
+            for line in f:
+                count += 1.
+
+
+        for i in range(0, int(count)):
+
+            line = dGT_file.readline()
+            list_line = line.split(',')
+            photo_id = list_line[0]
+            cluster_number = list_line[1]
+            def_list = [photo_id, cluster_number]    
+            list_clus_belong_photos.append(def_list)
+
+        dGT_file.close()
+
+        return (list_clus_belong_photos)
+
+##-- End of Class 6: Win6 --##
+
+# ------------------------------------------
 
 root.geometry("%dx%d+%d+%d" % (width_window,height_window,coordinate_x,coordinate_y))
 
