@@ -32,11 +32,14 @@ class Win1(Frame):
 
 
     def __init__(self, parent):
-        Frame.__init__(self,parent)
-        self.parent = parent
-        self.grid()
-        self.PutWidgets()
+        
+        Frame.__init__(self,parent) # init the frame
+        self.parent = parent        # make the Frame the parent
+        self.grid()                 # make it with grid structure
+        self.PutWidgets()           # Call to PutWidgets() Function
+
         return
+
 
     def Exit(self):
         exit()
@@ -84,16 +87,16 @@ class Win1(Frame):
         bttExit.grid(row = 5, column = 4)
 
         
-
         return
+
 
     def ResultsWindow(self):
 
-        new_frame = Toplevel(self.master)
-        new_frame.title("Results Window")
-        new_frame.geometry("350x200")
-        new_frame.grid()
-        Win3(new_frame)
+        tpl_result_window = Toplevel(self.master)
+        tpl_result_window.title("Results Window")
+        tpl_result_window.geometry("350x200")
+        tpl_result_window.grid()
+        Win3(tpl_result_window)
 
 
         return
@@ -101,11 +104,12 @@ class Win1(Frame):
 
     def EvalWindow(self):
 
-        new_frame = Toplevel(self.master)
-        new_frame.title("Evaluation Window")
-        new_frame.geometry("350x200")
-        new_frame.grid()
-        Win4(new_frame)
+        tpl_eval_window = Toplevel(self.master)
+        tpl_eval_window.title("Evaluation Window")
+        tpl_eval_window.geometry("350x200")
+        tpl_eval_window.grid()
+        Win4(tpl_eval_window)
+
 
         return
 
@@ -131,24 +135,24 @@ class Win2():
                         'mediumaquamarine', 'turquoise', 'paleturquoise', 'darkcyan','aqua','deepskyblue', 'steelblue', 
                         'dodgerblue', 'blueviolet','magenta', 'mediumvioletred',  'hotpink', 'crimson', 'pink']
 
-        images_vector_url = self.Reading_folder_images(num_topic,folder_topic)
-        images_vector_jpg =  self.ResizePhotos(images_vector_url)
+        list_images_url = self.Reading_folder_images(num_topic,folder_topic)
+        list_images_resized =  self.ResizePhotos(list_images_url)
 
         name_topic = self.FrameUP(num_topic,Color_List)
-        self.FramesDown(images_vector_url,num_topic,name_topic,Color_List,editable_names,images_vector_jpg)
+        self.FramesDown(list_images_url,num_topic,name_topic,Color_List,editable_names,list_images_resized)
     
 
         return
 
 
-    def ResizePhotos(self,url_vector):
+    def ResizePhotos(self,list_url_images):
 
         list_photo_type = []
         img_type = 0 
 
-        for i in range(0, len(url_vector)):
+        for i in range(0, len(list_url_images)):
 
-            img = Image.open(url_vector[i])
+            img = Image.open(list_url_images[i])
 
             width,height = img.size
 
@@ -591,38 +595,29 @@ class Win3():
 
 
     def PutWidgets(self):        
-        
-        # btt_prove = Button(self.master,text="Pulsame")
-        # btt_prove.grid(row = 0, column = 0)
 
 
-        #labels for help to construct the interface
-        labl1 = Label(self.master,text="      ")
-        labl1.grid(row=0,column=1)
+        #Empty labels for help to construct the interface
+        lbl1 = Label(self.master,text="      ")
+        lbl1.grid(row=0,column=1)
 
-        labl2 = Label(self.master,text="      ")
-        labl2.grid(row=0,column=2)
+        lbl2 = Label(self.master,text="      ")
+        lbl2.grid(row=0,column=2)
 
-        labl3 = Label(self.master,text="      ")
-        labl3.grid(row=1,column=1)
+        lbl3 = Label(self.master,text="      ")
+        lbl3.grid(row=1,column=1)
 
-        labl4 = Label(self.master,text="      ")
-        labl4.grid(row=1,column=2)
+        lbl4 = Label(self.master,text="      ")
+        lbl4.grid(row=1,column=2)
 
-        labl5 = Label(self.master,text="      ")
-        labl5 = Label(self.master,text="      ")
+        lbl5 = Label(self.master,text="      ")
+        lbl5.grid(row=2,column=2)
 
-        labl6 = Label(self.master,text="      ")
-        labl6.grid(row=2,column=2)
+        lbl6 = Label(self.master,text="      ")
+        lbl6.grid(row=2,column=0)
 
-        labl7 = Label(self.master,text="      ")
-        labl7.grid(row=2,column=0)
-
-        # self.labl8.config(text="    ")
-        # self.labl8.grid(row=5,column=1)
-
-        labl9 = Label(self.master,text="      ")
-        labl9.grid(row=4,column=1)
+        lbl7 = Label(self.master,text="      ")
+        lbl7.grid(row=4,column=1)
 
 
        
