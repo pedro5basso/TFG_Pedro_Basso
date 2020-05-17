@@ -10,6 +10,7 @@ from matplotlib import colors as mcolors
 from tkinter import filedialog
 import webbrowser
 import csv
+import io
 
 
 ###---GLOBAL VARIABLES---###
@@ -216,17 +217,24 @@ class Win2():
 
     def Read_topics_file(self, num_topic):
 
-        file_topics_numbers = open("C:/Users/Pedro/Desktop/TFG/b/gt/all_topics.txt","r")
+        filename = "C:/Users/Pedro/Desktop/TFG/b/gt/all_topics.txt"
+
+        count = 0 
+        with open(filename, 'r') as f:
+            for line in f:
+                count += 1.
+
+        file_all_topics = open(filename,'r')
 
         list_topic = []
 
-        for i in range(0, 134):
+        for i in range(0, int(count)):
 
-            line = file_topics_numbers.readline()            
+            line = file_all_topics.readline()            
             list_line = line.split()            
             list_topic.append(list_line[1])
 
-        file_topics_numbers.close()
+        file_all_topics.close()
 
         name_topic = list_topic[int(num_topic) - 1]        
 
@@ -267,7 +275,7 @@ class Win2():
         self.images_vector_jpg = images_vector_jpg
 
         #Read rGT file
-        list_similarity = self.ReadRGTFile(num_topic,name_topic,fotos_num)
+        list_similarity = self.ReadRGTFile(num_topic,name_topic)
         
 
         #Read dGT file
@@ -328,17 +336,21 @@ class Win2():
                     _lbl_cluster = tk.Label(frames_grid[i][j])
                     _lbl_cluster.grid(row=1, column=2, sticky='w')
 
-                    if(list_similarity[_num_fotos - 1] != '1'): #because in some folders there are '-1' instead of 0
+                    sim = self.SearchSimilarity(url_image,list_similarity)
+                    # print(sim_pack[0])
+
+                    if(sim != 1):
+                        # print(sim_pack[0])
+                        # print("soy 0")
 
                         canvas_grid[i][j].config(bg='white')            
                             
                         bckgrnd_lbl = 'red'
                         _lbl_number.config(bg=bckgrnd_lbl)
 
-                        _lbl_cluster.config(text="No Cluster", bg='black', fg='white')
-
-                    else:                  
-                    
+                        _lbl_cluster.config(text="No Cluster", bg='black', fg='white')   
+                    else:
+                        # print("soy 1")
                         #Background for the image                        
                         color_bckgrn,number_cluster = self.SetColorCluster(url_image,list_clus_belong_photos,Color_List)
                         canvas_grid[i][j].config(bg=color_bckgrn)
@@ -346,7 +358,6 @@ class Win2():
                         bckgrnd_lbl = 'green'
                         _lbl_number.config(bg=bckgrnd_lbl)
 
-                        # _lbl_cluster = tk.Label(frames_grid[i][j], text="Cluster "+str(number_cluster) + list_cluster_in_topic[int(number_cluster) - 1])
                         _lbl_cluster.config( text="Cluster "+str(number_cluster), bg=color_bckgrn)
 
 
@@ -354,7 +365,9 @@ class Win2():
                     canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300, bg='black')                
                     canvas_grid[i][j].grid(row=0, column=0)
                     _lbl_number = tk.Label(frames_grid[i][j], text="IMAGE "+str(_num_fotos))
-                    _lbl_number.grid(row=1, column=0, sticky='s')                           
+                    _lbl_number.grid(row=1, column=0, sticky='s')
+                    
+                                            
                                         
                 
 
@@ -370,6 +383,34 @@ class Win2():
 
         return
 
+
+    def SearchSimilarity(self, url_image,list_similarity):
+
+        search = False
+        list_length = len(list_similarity)
+        
+        counter = 0
+
+        while((counter < list_length) and (not search)):
+
+            _pack = list_similarity[counter]
+            # print(_pack)
+            _photo_id = _pack[0]
+
+
+            if(url_image == _photo_id):
+                search = True
+                if(int(_pack[1]) == 1):
+                    sim = 1
+                else:
+                    sim = 0
+
+            counter += 1
+
+
+
+
+        return (sim)
 
 
     def SetColorCluster(self,url_image,list_clus_belong_photos,Color_List):
@@ -395,9 +436,11 @@ class Win2():
             number_cluster = aux_[1]
             #Then associate the image with their color cluster
             color = Color_List[int(number_cluster) - 1]
-        else:
-            color = 'white'
-            # number_cluster = 0
+        # else:
+        #     color = 'white'
+        #     # print("estoy mal")
+        #     # print(url_image)
+        #     number_cluster = 0
 
 
         return(color,number_cluster)
@@ -413,7 +456,7 @@ class Win2():
         return (img_)
 
 
-    def ReadRGTFile(self,num_topic,name_topic,number_objects):
+    def ReadRGTFile(self,num_topic,name_topic):
 
 
         if(int(num_topic) <= 70): #the file is in devset folder
@@ -422,19 +465,38 @@ class Win2():
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/rGT/" + name_topic + " rGt.txt"
 
 
-        rGT_file = open(filename, 'r')
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
+
+            rGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            rGT_file = io.open(filename, 'r')
+
 
         list_similarity = []
 
-        for i in range(0, number_objects):
+        for i in range(0, int(count)):
 
             line = rGT_file.readline()
-            list_line = line.split()
-            a = list_line[0]
-            b = a[-1]
-            list_similarity.append(b)
+            list_line = line.split(',')
+            photo_id = list_line[0]
+            sim = list_line[-1]
+            _pack = [photo_id,sim]
+            list_similarity.append(_pack)
+            # print(list_similarity[i],'\n')
 
         rGT_file.close()
+
+        
 
         return (list_similarity)
 
@@ -447,12 +509,21 @@ class Win2():
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dclusterGt.txt"
         
 
-        dclusterGT_file = open(filename,'r')
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
 
-        count = 0
-        with open(filename, 'r') as f:
-            for line in f:
-                count += 1.
+            dclusterGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            dclusterGT_file = io.open(filename, 'r')
 
         list_cluster_topic = []
 
@@ -475,15 +546,23 @@ class Win2():
         else:#the file is in testset folder
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dGt.txt"
 
-        dGT_file = open(filename, 'r')
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
+
+            dGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            dGT_file = io.open(filename, 'r')
 
         list_clus_belong_photos = []
-
-        count = 0
-        with open(filename, 'r') as f:
-            for line in f:
-                count += 1.
-
 
         for i in range(0, int(count)):
 
@@ -824,8 +903,8 @@ class Win5():
         # mostrar  fotos (basarse en la clase 2)
         result_list = self.ReadEvalFile(path_filename)
 
-        self.Top_Frame(filename)
-        self.Bottom_Frame(result_list,filename)
+        num_topic,name_topic = self.Top_Frame(filename)
+        self.Bottom_Frame(result_list,num_topic,name_topic)
 
         
 
@@ -874,24 +953,6 @@ class Win5():
 
     def Top_Frame(self,filename):
 
-        lbl_filename = Label(self.master, text="FILE SELECTED: " + filename) #cambiar tamaño y letra
-        lbl_filename.grid(row=0,column=2)
-
-        btt_close_window = Button(self.master, text="Close", command=self.CloseWindow)
-        btt_close_window.grid(row=0,column=4)
-
-
-        return
-
-    def CloseWindow(self):
-
-        self.master.destroy()
-
-        return
-
-    def Bottom_Frame(self,result_list,filename):
-
-        # Misma estructura que la clase 2
 
         # 1: estraer el número del fichero para saber el tópico
         num_topic = self.Extract_Number_of_filename(filename)
@@ -899,10 +960,36 @@ class Win5():
 
         # 2: Relacionar con el nombre del tópico, para poder acceder a la carpeta de las fotos
         name_topic = self.NameTopic(num_topic)
+
+        lbl_filename = Label(self.master, text="FILE SELECTED: " + filename) #cambiar tamaño y letra
+        lbl_filename.grid(row=0,column=1)
+
+
+        lbl_topic_info = Label(self.master, text="Topic "+num_topic + ": "+ name_topic )
+        lbl_topic_info.grid(row=0,column=3)
+
+
+        btt_close_window = Button(self.master, text="Close", command=self.CloseWindow)
+        btt_close_window.grid(row=0,column=4)
+
+        
+        return(num_topic,name_topic)
+
+    def CloseWindow(self):
+
+        self.master.destroy()
+
+        return
+
+    def Bottom_Frame(self,result_list,num_topic,name_topic):
+
+        # Misma estructura que la clase 2
+
+        
         # print(name_topic)
         
         list_rgt = self.ReadRGTFile(num_topic,name_topic)
-        
+        # print(len(list_rgt))
 
         # Make 1 list with the only 50 photos of the result
         list_50_images = self.Make50ImagesList(result_list,name_topic)
@@ -912,6 +999,9 @@ class Win5():
 
 
         list_sim_50_photos = self.Make50similarityList(list_rgt,result_list)
+
+        # print(len(list_resized_photos))   
+        # print(len(list_sim_50_photos))
 
 
         self.MakeBotFrame(num_topic, name_topic,list_resized_photos,list_sim_50_photos)
@@ -940,15 +1030,16 @@ class Win5():
             img_ex_file = pack_0[1]  #extract the photo from the examination folder
             count_2 = 0
             search = False
-            
+                
 
             while( (count_2 < size_list_solutions) and (not search)):
 
                 pack_ = list_rgt[count_2]
                 img_sol_file = pack_[0] # extract the image of the solution file
-
+                
+                
                 if(img_ex_file == img_sol_file): # the image are equal
-
+                    
                     search = True
                     sim = int(pack_[1]) # extract the similarity of rGT folder             
 
@@ -964,7 +1055,7 @@ class Win5():
 
             count_1 += 1
 
-
+        
         return(list_50_img_similarity)
 
 
@@ -1068,6 +1159,7 @@ class Win5():
                     _name = _pack_name[0]
 
                     _lbl_number = tk.Label(frames_grid[i][j], text="IMAGE ID: " + _name)
+                    _lbl_number.config(bg=bg_color)
                     _lbl_number.grid(row=1, column=0, sticky='s')
 
 
@@ -1086,12 +1178,6 @@ class Win5():
 
                     lbl_recall = Label(frames_grid[i][j], text="r = " + str(recall_2_decimals))
                     lbl_recall.grid(row=1,column=2, sticky='w')
-
-
-                    # _lbl_cluster = tk.Label(frames_grid[i][j])
-                    # _lbl_cluster.grid(row=1, column=2, sticky='w')
-
-
 
 
                 else:
@@ -1163,18 +1249,30 @@ class Win5():
 
     def ReadRGTFile(self,num_topic,name_topic):
 
+        
+
         if(int(num_topic) <= 70): #the file is in devset folder
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/rGT/" + name_topic + " rGt.txt"
         else:#the file is in testset folder
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/rGT/" + name_topic + " rGt.txt"
 
 
-        count = 0
-        with open(filename, 'r') as f:
-            for line in f:
-                count += 1.
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
 
-        rGT_file = open(filename, 'r')
+            rGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            rGT_file = io.open(filename, 'r')
+        
 
         list_similarity = []
 
@@ -1188,6 +1286,7 @@ class Win5():
             list_similarity.append(def_list)
 
         rGT_file.close()
+
 
         return (list_similarity)
 
