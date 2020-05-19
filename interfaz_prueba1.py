@@ -1130,13 +1130,13 @@ class Win5():
                     clust = (pack_[1]) # extract the cluster of dGT folder
                     list_50_clust.append(clust)
 
-                               
+                             
                 count_2 += 1
 
-            
+
             count_1 += 1
 
-        # print(list_50_clust)
+        # print(len(list_50_clust))
         return(list_50_clust)
 
 
@@ -1242,6 +1242,8 @@ class Win5():
 
 
         precission_list = []
+        Clust_Recall_list = []
+        F1_score_list = []
         cont_aux = 0
         #Frame para el canvas
         
@@ -1289,19 +1291,68 @@ class Win5():
 
                 if(_num_fotos <= fotos_num):
 
+                    _pack_name = list_sim_50_photos[_num_fotos - 1]
+                    _name = _pack_name[0]
+
+                    sim = _pack_name[1]
+                    total_sim += int(sim)
+
+                    precision = total_sim / (_num_fotos)
+                    precission_list.append(precision)
+
+                    recall = total_sim / number_of_ones
+
+
+                    precison_2_decimals = "%.4f" % precision
+                    recall_2_decimals = "%.4f" % recall
+                    
+                    
+                    lbl_precision = Label(frames_grid[i][j], text="P@" + str(_num_fotos) + "= " + str(precison_2_decimals) )
+                    lbl_precision.grid(row=1, column=1, sticky='w')
+
+                    lbl_recall = Label(frames_grid[i][j], text="R= " + str(recall_2_decimals))
+                    lbl_recall.grid(row=1,column=2, sticky='w')
+
                     _pack_sim = list_sim_50_photos[_num_fotos - 1]
                     sim_image = _pack_sim[1]
 
                     if(sim_image == '1'):
+
                         bg_color='green'
+
                         CR = list_n_times_clust[cont_aux -1] / num_of_clusters
-                        CR_2_decimals = "%.3f" % CR
-                        lbl_CR = Label(frames_grid[i][j], text = "CR@" + str(_num_fotos) + "= "+ str(CR_2_decimals))
-                        lbl_CR.grid(row=2,column=2)
+                        Clust_Recall_list.append(CR)
+                        
+                        F1 = 2*((precision * CR)/(precision + CR))
+                        # F1_score_list.append(F1)
+                        
 
                     else:
                         bg_color='red'
+                        if(len(Clust_Recall_list) == 0):
+                            CR = 0
+                            F1 = 0
+                        else:
+                            # print(_num_fotos)
+                            # print(len(Clust_Recall_list))
+                            CR = Clust_Recall_list[-1]
+                            F1 = 2*((precision * CR)/(precision + CR))
+                        # Clust_Recall_list.append(CR)
+
                         cont_aux -= 1
+
+                    F1_2_decimals = "%.4f" % F1
+                    lbl_F1 = Label(frames_grid[i][j], text="F1@" + str(_num_fotos) + "= "+ str(F1_2_decimals))
+                    lbl_F1.grid(row=2,column=1)
+
+                    CR_2_decimals = "%.4f" % CR
+                    lbl_CR = Label(frames_grid[i][j], text = "CR@" + str(_num_fotos) + "= "+ str(CR_2_decimals))
+                    lbl_CR.grid(row=2,column=2)
+
+
+                    _lbl_number = tk.Label(frames_grid[i][j], text="ID: " + _name)
+                    _lbl_number.config(bg=bg_color)
+                    _lbl_number.grid(row=1, column=0, sticky='s')
 
                     canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300,bg=bg_color)
                     canvas_grid[i][j].grid(row=0, column=0, columnspan=4)
@@ -1323,46 +1374,6 @@ class Win5():
                         
                         canvas_grid[i][j].create_image(0,0, image=self.image, anchor='nw')
 
-                    
-                    _pack_name = list_sim_50_photos[_num_fotos - 1]
-                    _name = _pack_name[0]
-
-                    _lbl_number = tk.Label(frames_grid[i][j], text="ID: " + _name)
-                    _lbl_number.config(bg=bg_color)
-                    _lbl_number.grid(row=1, column=0, sticky='s')
-
-
-                    sim = _pack_name[1]
-                    total_sim += int(sim)
-
-                    precision = total_sim / (_num_fotos)
-                    precission_list.append(precision)
-
-                    recall = total_sim / number_of_ones
-
-                    
-
-                    if(precision == 0 and recall == 0):
-                        F1 = 0
-                    else:
-                        F1 = 2*((precision * recall)/(precision + recall))
-
-                    precison_2_decimals = "%.3f" % precision
-                    recall_2_decimals = "%.3f" % recall
-                    F1_2_decimals = "%.3f" % F1
-                    
-                    lbl_precision = Label(frames_grid[i][j], text="P@" + str(_num_fotos) + "= " + str(precison_2_decimals) )
-                    lbl_precision.grid(row=1, column=1, sticky='w')
-
-                    lbl_recall = Label(frames_grid[i][j], text="R= " + str(recall_2_decimals))
-                    lbl_recall.grid(row=1,column=2, sticky='w')
-
-                    lbl_F1 = Label(frames_grid[i][j], text="F1@" + str(_num_fotos) + "= "+ str(F1_2_decimals))
-                    lbl_F1.grid(row=2,column=1)
-                    
-                    
-                    
-
 
                 else:
                     canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300, bg='black')                
@@ -1380,7 +1391,7 @@ class Win5():
 
         AP_def = self.Calculate_AP(precission_list,AP_list,number_of_ones)
 
-        lbl_AP = Label(self.master, text = "Average Precision = "+ str(AP_def))
+        lbl_AP = Label(self.master, text = "AP@"+str(_num_fotos)+"= "+ str(AP_def))
         lbl_AP.grid(row=2,column=0)
 
         
