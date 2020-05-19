@@ -989,6 +989,9 @@ class Win5():
         # print(name_topic)
         
         list_rgt = self.ReadRGTFile(num_topic,name_topic)
+
+        list_dgt = self.ReadDGTFile(num_topic,name_topic)
+        
         # print(len(list_rgt))
 
         # Make 1 list with the only 50 photos of the result
@@ -998,16 +1001,51 @@ class Win5():
         list_resized_photos =  self.ResizePhotos(list_50_images)
 
 
-        list_sim_50_photos = self.Make50similarityList(list_rgt,result_list)
-
-        # print(len(list_resized_photos))   
+        list_sim_50_photos,number_of_ones,AP_list = self.Make50similarityList(list_rgt,result_list)
         # print(len(list_sim_50_photos))
 
+        num_of_clusters = self.ReadDclusterGT(num_topic,name_topic)
+        
+        list_clust_50 = self.Make50ClusterList(list_dgt,result_list)
+        # print(len(list_clust_50))
+        list_n_times_clust = self.MakeList_Compute_ClusterR(list_clust_50)
+        # print(len(list_clust_50))
+        
 
-        self.MakeBotFrame(num_topic, name_topic,list_resized_photos,list_sim_50_photos)
+
+        self.MakeBotFrame(num_topic, name_topic,list_resized_photos,list_sim_50_photos,number_of_ones,AP_list,num_of_clusters,list_n_times_clust)
 
 
         return
+
+
+    def MakeList_Compute_ClusterR(self,list_clust_50):
+
+        # example input: [6,1,11,6,6,4,6,4,4,4]
+        # example output: [1,2,3,3,3,4,4,4,4]
+
+        def_list = []
+        aux_list = []
+        cont = 1
+        def_list.append(cont)
+        aux_list.append(list_clust_50[0])
+        i = 1
+        search = False
+        muestra = list_clust_50[0]
+        while( i < len(list_clust_50)):
+            
+            aux_list.append(muestra)
+
+            if(aux_list.count(list_clust_50[i]) == 0):
+                cont +=1
+                
+            muestra = list_clust_50[i]
+
+            def_list.append(cont)
+            i += 1
+
+
+        return(def_list)
 
 
     def Make50similarityList(self,list_rgt,result_list):
@@ -1022,7 +1060,8 @@ class Win5():
         size_list_solutions = len(list_rgt)
         count_1 = 0
         count_2 = 0
-        
+        number_of_ones = 0
+        AP_list = []
 
         while(count_1 < size_list_examinations):
             
@@ -1030,7 +1069,7 @@ class Win5():
             img_ex_file = pack_0[1]  #extract the photo from the examination folder
             count_2 = 0
             search = False
-                
+               
 
             while( (count_2 < size_list_solutions) and (not search)):
 
@@ -1046,17 +1085,138 @@ class Win5():
                     if(sim == 0):
                         pack_3 = [img_ex_file,'0']
                         list_50_img_similarity.append(pack_3)
+                        AP_list.append(0)
                     else:
+                        number_of_ones += 1
                         pack_3 = [img_ex_file,'1']
                         list_50_img_similarity.append(pack_3)
+                        AP_list.append(1)
+
+                               
+                count_2 += 1
+            
+            count_1 += 1
+
+        
+        return(list_50_img_similarity,number_of_ones,AP_list)
+
+
+
+    def Make50ClusterList(self,list_dgt,result_list):
+
+        list_50_clust = []
+        search = False
+        size_list_examinations = len(result_list)
+        
+        size_list_solutions = len(list_dgt)
+        count_1 = 0
+        count_2 = 0
+
+        while(count_1 < size_list_examinations):  
+
+            pack_0 = result_list[count_1]
+            img_ex_file = pack_0[1]  #extract the photo from the examination folder
+            count_2 = 0
+            search = False   
+
+            while( (count_2 < size_list_solutions) and (not search)):
+
+                pack_ = list_dgt[count_2]
+                img_sol_file = pack_[0] # extract the image of the solution file
+                
+                if(img_ex_file == img_sol_file): # the image are equal
+
+                    search = True
+                    clust = (pack_[1]) # extract the cluster of dGT folder
+                    list_50_clust.append(clust)
 
                                
                 count_2 += 1
 
+            
             count_1 += 1
 
+        # print(list_50_clust)
+        return(list_50_clust)
+
+
+
+
+    def ReadDGTFile(self,num_topic,name_topic):
+
+        if(int(num_topic) <= 70): #the file is in devset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dGt.txt"
+        else:#the file is in testset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dGt.txt"
+
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
+
+            dGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            dGT_file = io.open(filename, 'r')
+
+        list_clus_belong_photos = []
+
+        for i in range(0, int(count)):
+
+            line = dGT_file.readline()
+            list_line = line.split(',')
+            photo_id = list_line[0]
+            cluster_number = list_line[1]
+            def_list = [photo_id, cluster_number]    
+            list_clus_belong_photos.append(def_list)
+
+        dGT_file.close()
+
+        return (list_clus_belong_photos)
+
+    def ReadDclusterGT(self,num_topic,name_topic):
+
+        if(int(num_topic) <= 70): #the file is in devset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dclusterGt.txt"
+        else:#the file is in testset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dclusterGt.txt"
         
-        return(list_50_img_similarity)
+
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
+
+            dclusterGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            dclusterGT_file = io.open(filename, 'r')
+
+        list_cluster_topic = []
+
+        for i in range(0, int(count)):
+
+            line = dclusterGT_file.readline()
+            list_line = line.split(',')               
+            list_cluster_topic.append(list_line[0])
+
+
+
+        dclusterGT_file.close()
+
+        return (len(list_cluster_topic))
 
 
     def Make50ImagesList(self,result_list,name_topic):
@@ -1078,9 +1238,11 @@ class Win5():
         return(list_images_50)
 
 
-    def MakeBotFrame(self,num_topic, name_topic,list_resized_photos,list_sim_50_photos):
+    def MakeBotFrame(self,num_topic, name_topic,list_resized_photos,list_sim_50_photos,number_of_ones,AP_list,num_of_clusters,list_n_times_clust):
 
 
+        precission_list = []
+        cont_aux = 0
         #Frame para el canvas
         
         frame_canvas = Frame(self.master)
@@ -1110,13 +1272,14 @@ class Win5():
         fotos_num = len(list_resized_photos)
 
         self.images_vector_jpg = list_resized_photos
-
+        
 
         total_sim = 0
 
         for i in range (1, rows):
 
             _num_fotos += 1
+            cont_aux += 1
 
             for j in range (1, columns):
 
@@ -1131,11 +1294,17 @@ class Win5():
 
                     if(sim_image == '1'):
                         bg_color='green'
+                        CR = list_n_times_clust[cont_aux -1] / num_of_clusters
+                        CR_2_decimals = "%.3f" % CR
+                        lbl_CR = Label(frames_grid[i][j], text = "CR@" + str(_num_fotos) + "= "+ str(CR_2_decimals))
+                        lbl_CR.grid(row=2,column=2)
+
                     else:
                         bg_color='red'
+                        cont_aux -= 1
 
                     canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300,bg=bg_color)
-                    canvas_grid[i][j].grid(row=0, column=0, columnspan=3)
+                    canvas_grid[i][j].grid(row=0, column=0, columnspan=4)
 
                     self.pack = self.images_vector_jpg[_num_fotos-1] 
                     self.img_type = self.pack[1] #type of the image (size)
@@ -1158,7 +1327,7 @@ class Win5():
                     _pack_name = list_sim_50_photos[_num_fotos - 1]
                     _name = _pack_name[0]
 
-                    _lbl_number = tk.Label(frames_grid[i][j], text="IMAGE ID: " + _name)
+                    _lbl_number = tk.Label(frames_grid[i][j], text="ID: " + _name)
                     _lbl_number.config(bg=bg_color)
                     _lbl_number.grid(row=1, column=0, sticky='s')
 
@@ -1167,17 +1336,32 @@ class Win5():
                     total_sim += int(sim)
 
                     precision = total_sim / (_num_fotos)
+                    precission_list.append(precision)
 
-                    recall = total_sim / fotos_num
+                    recall = total_sim / number_of_ones
 
-                    precison_2_decimals = "%.2f" % precision
-                    recall_2_decimals = "%.2f" % recall
+                    
 
+                    if(precision == 0 and recall == 0):
+                        F1 = 0
+                    else:
+                        F1 = 2*((precision * recall)/(precision + recall))
+
+                    precison_2_decimals = "%.3f" % precision
+                    recall_2_decimals = "%.3f" % recall
+                    F1_2_decimals = "%.3f" % F1
+                    
                     lbl_precision = Label(frames_grid[i][j], text="P@" + str(_num_fotos) + "= " + str(precison_2_decimals) )
                     lbl_precision.grid(row=1, column=1, sticky='w')
 
-                    lbl_recall = Label(frames_grid[i][j], text="r = " + str(recall_2_decimals))
+                    lbl_recall = Label(frames_grid[i][j], text="R= " + str(recall_2_decimals))
                     lbl_recall.grid(row=1,column=2, sticky='w')
+
+                    lbl_F1 = Label(frames_grid[i][j], text="F1@" + str(_num_fotos) + "= "+ str(F1_2_decimals))
+                    lbl_F1.grid(row=2,column=1)
+                    
+                    
+                    
 
 
                 else:
@@ -1189,9 +1373,18 @@ class Win5():
                 
 
                 _num_fotos += 1
+                cont_aux += 1
 
             _num_fotos -= 1
+            cont_aux -= 1
 
+        AP_def = self.Calculate_AP(precission_list,AP_list,number_of_ones)
+
+        lbl_AP = Label(self.master, text = "Average Precision = "+ str(AP_def))
+        lbl_AP.grid(row=2,column=0)
+
+        
+        # print(AP_def)
         #End loop For------------------
 
         
@@ -1200,6 +1393,25 @@ class Win5():
         GENERAL_CANVAS.config(scrollregion=GENERAL_CANVAS.bbox("all"))
 
         return
+
+
+    def Calculate_AP(self,precission_list,AP_list,number_of_ones):
+
+        AP = 0
+        total_sum_prod = 0
+        _prod = 0
+
+        for i in range(0,len(precission_list)):
+
+            _prod = precission_list[i] * AP_list[i]
+
+            total_sum_prod += _prod
+        
+        AP = (total_sum_prod / number_of_ones)
+        AP_def = "%.3f" % AP
+
+        return(AP_def)
+
 
     def Extract_Number_of_filename(self, filename):
 
