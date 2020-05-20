@@ -1344,7 +1344,8 @@ class Win5():
 
 
                     #for graphics
-                    
+                    Cust_recall_graphic_list.append(CR)
+                    F1_score_list.append(F1)
 
 
                     F1_2_decimals = "%.4f" % F1
@@ -1400,8 +1401,16 @@ class Win5():
         lbl_AP = Label(self.master, text = "AP@"+str(_num_fotos)+"= "+ str(AP_def))
         lbl_AP.grid(row=2,column=0)
 
+        btt_graphics = Button(self.master, text="Graphics", command= lambda: self.MakeGraphics(precission_list,Cust_recall_graphic_list,F1_score_list))
+        btt_graphics.grid(row=2,column=2)
+
+        btt_pie_chart = Button(self.master, text="Pie Chart Similarity", command= lambda: self.MakePieChart(precission_list,number_of_ones))
+        btt_pie_chart.grid(row=2,column=3)
+
         
-        # print(AP_def)
+        # print(len(precission_list))
+        # print(len(F1_score_list))
+        # print(len(Cust_recall_graphic_list))
         #End loop For------------------
 
         
@@ -1410,6 +1419,53 @@ class Win5():
         GENERAL_CANVAS.config(scrollregion=GENERAL_CANVAS.bbox("all"))
 
         return
+
+
+    def MakePieChart(self,precission_list,number_of_ones):
+
+        # Data to plot
+        labels = 'Similarity', 'No Similarity'
+        num_0 = len(precission_list) - number_of_ones
+        sizes = [number_of_ones, num_0]
+        colors = ['green', 'red']
+        explode = (0, 0)  # explode 1st slice
+
+        # Plot
+        plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+        autopct='%1.1f%%', shadow=False, startangle=140)
+
+        plt.axis('equal')
+        plt.show()
+
+
+        return
+
+
+    def MakeGraphics(self,precission_list,Cust_recall_graphic_list,F1_score_list):
+
+        X_axis_list = list(range(0,len(precission_list)))
+
+
+        # Create plots with pre-defined labels.
+        fig, ax = plt.subplots()
+        ax.plot(X_axis_list, precission_list, 'k',color='red', label='Precission')
+        ax.plot(X_axis_list, Cust_recall_graphic_list, 'k',color='blue', label='Cluster Recall')
+        ax.plot(X_axis_list, F1_score_list, 'k', color='green', label='F1 Score')
+
+        # Shrink current axis's height by 10% on the bottom
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0 + box.height * 0.1,
+                        box.width, box.height * 0.9])
+
+        # Put a legend below current axis
+        ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
+                fancybox=True, shadow=True, ncol=5)
+
+        plt.show()
+
+
+        return
+
 
 
     def Calculate_AP(self,precission_list,AP_list,number_of_ones):
