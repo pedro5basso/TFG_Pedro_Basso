@@ -1243,6 +1243,7 @@ class Win5():
 
         precission_list = []
         Clust_Recall_list = []
+        Cust_recall_graphic_list = []
         F1_score_list = []
         cont_aux = 0
         #Frame para el canvas
@@ -1340,6 +1341,11 @@ class Win5():
                         # Clust_Recall_list.append(CR)
 
                         cont_aux -= 1
+
+
+                    #for graphics
+                    
+
 
                     F1_2_decimals = "%.4f" % F1
                     lbl_F1 = Label(frames_grid[i][j], text="F1@" + str(_num_fotos) + "= "+ str(F1_2_decimals))
