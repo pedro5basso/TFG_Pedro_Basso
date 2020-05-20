@@ -1424,11 +1424,13 @@ class Win5():
     def MakePieChart(self,precission_list,number_of_ones):
 
         # Data to plot
-        labels = 'Similarity', 'No Similarity'
+        
         num_0 = len(precission_list) - number_of_ones
         sizes = [number_of_ones, num_0]
         colors = ['green', 'red']
         explode = (0, 0)  # explode 1st slice
+        labels = 'Similarity ('+ str(number_of_ones) + ')', 'No Similarity ('+ str(num_0) +')' 
+
 
         # Plot
         plt.pie(sizes, explode=explode, labels=labels, colors=colors,
