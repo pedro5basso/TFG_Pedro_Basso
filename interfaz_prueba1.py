@@ -281,7 +281,8 @@ class Win2():
         #Read dGT file
         list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic)
 
-
+        number_of_1 = 0
+        number_of_0 = 0
 
         for i in range (1, rows):
 
@@ -337,6 +338,12 @@ class Win2():
                     _lbl_cluster.grid(row=1, column=2, sticky='w')
 
                     sim = self.SearchSimilarity(url_image,list_similarity)
+                    if(sim == 1):
+                        number_of_1 += 1
+
+                    if(sim == 0):
+                        number_of_0 += 1
+                    
                     # print(sim_pack[0])
 
                     if(sim != 1):
@@ -380,15 +387,74 @@ class Win2():
         frame_fotos.update_idletasks()        
           
         GENERAL_CANVAS.config(scrollregion=GENERAL_CANVAS.bbox("all"))
+        
+        btt_grapics_clusters = Button(self.frame, text="Pie Chart Clusters", command = lambda: self.PieChartGraphicCluster(name_topic,num_topic,list_clus_belong_photos,Color_List))
+        btt_grapics_clusters.grid(row=2,column=2)
+
+        btt_graphics_similarity = Button(self.frame, text="Pie Chart Similarity", command = lambda: self.PieChartGraphicSimilarity(number_of_1,number_of_0))
+        btt_graphics_similarity.grid(row=2,column=1)
 
         return
 
+
+    def PieChartGraphicSimilarity(self,number_of_1,number_of_0):
+
+        # Data to plot
+        
+        sizes = [number_of_1, number_of_0]
+        labels = ['Similarity (' + str(number_of_1) + ')', 'No Similarity (' + str(number_of_0) + ')']
+        colors = ['green', 'red']
+        explode = (0, 0)  # explode 1st slice
+
+        # Plot
+        plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+        autopct='%1.1f%%', shadow=False, startangle=140)
+
+        plt.axis('equal')
+        plt.show()
+
+        return
+
+
+    def PieChartGraphicCluster(self,name_topic,num_topic,list_clus_belong_photos,Color_List):
+
+        list_clust = self.ReadDclusterGT(num_topic,name_topic)
+        num_clust = len(list_clust)
+
+        list_n_times = []
+        colors = []
+
+        clusters_numbers = [int(i[1]) for i in list_clus_belong_photos]
+
+        for i in range(0,num_clust):
+            n_times = clusters_numbers.count(i+1)
+            colors.append(Color_List[i])
+            list_n_times.append(n_times)
+
+        labels = []
+        sizes = list_n_times
+
+        for j in range(0, len(list_clust)):
+            labels.append('Topic '+str(j+1)+ ": " +list_clust[j] +"(" +str(list_n_times[j])+")")
+        # explode = (0, 0)  # explode 1st slice
+
+        # Plot
+        plt.pie(sizes,  labels=labels, colors=colors,
+        autopct='%1.1f%%', shadow=False, startangle=140)
+
+        plt.axis('equal')
+        plt.show()
+        
+
+        # print("Bon dia")
+        return
 
     def SearchSimilarity(self, url_image,list_similarity):
 
         search = False
         list_length = len(list_similarity)
-        
+        number_of_0 = 0
+        number_of_1 = 0
         counter = 0
 
         while((counter < list_length) and (not search)):
@@ -402,11 +468,12 @@ class Win2():
                 search = True
                 if(int(_pack[1]) == 1):
                     sim = 1
+                    
                 else:
                     sim = 0
+                    
 
             counter += 1
-
 
 
 
@@ -530,7 +597,7 @@ class Win2():
         for i in range(0, int(count)):
 
             line = dclusterGT_file.readline()
-            list_line = line.split(',')               
+            list_line = line.split(',')
             list_cluster_topic.append(list_line[1])
 
 
