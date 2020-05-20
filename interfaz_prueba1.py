@@ -792,7 +792,7 @@ class Win3():
     def ResultsWindow(self):
 
         # num_topic = self.NUM_TOPIC.get()
-        editable_names = self.CheckVar.get()
+        editable_names = self.CheckVarEditable.get()
         root.filename =  filedialog.askdirectory()
         url_list = root.filename.split('/')
         folder_name = url_list[-1]
