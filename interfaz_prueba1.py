@@ -726,7 +726,9 @@ class Win2():
 # Class 3: Win3 
 class Win3():
     
-    CheckVar = IntVar()
+    CheckVarEditable = IntVar()
+    CheckVarClusters = IntVar()
+
 
     def __init__(self, master):
 
@@ -777,8 +779,11 @@ class Win3():
         ExitButton.grid(row=5, column=4)
 
 
-        NamesCheckButton = Checkbutton(self.master,text="Editable Names", variable=self.CheckVar, onvalue=1, offvalue=0)
+        NamesCheckButton = Checkbutton(self.master,text="Editable Names", variable=self.CheckVarEditable, onvalue=1, offvalue=0)
         NamesCheckButton.grid(row=4,column=2)
+
+        ClusterCheckButton = Checkbutton(self.master,text="Order by Cluster", variable=self.CheckVarClusters, onvalue=1, offvalue=0)
+        ClusterCheckButton.grid(row=4,column=3)
 
 
         return
