@@ -994,11 +994,6 @@ class Win4():
         root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select Cluster file",filetypes = ((".txt files","*.txt"),("all files","*.*")))
         url_list = root.filename.split('/')
         file_txt_name = url_list[-1]
-        # self.new = Toplevel(self.master)
-        # self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
-        # # self.new.geometry("640x640")
-        # self.new.grid()
-        # Win6(self.new,file_txt_name,root.filename)
 
         self.MakeSpecificFiles(file_txt_name,root.filename)
 
@@ -1885,105 +1880,6 @@ class Win5():
         return list_photo_type
 
 ##-- End of Class 5: Win5 --##
-
-# ------------------------------------------
-
-# Class 6: Win6
-class Win6():
-
-    def __init__(self, master,file_txt_name,file_path):
-
-        self.master = master
-        self.frame = tk.Frame(self.master)
-
-        name_topic,num_topic = self.Extract_Name_Number_Topic(file_txt_name)
-        
-        list_clus_belong_photos = self.ReadClustersFile(file_path)
-        print(list_clus_belong_photos[0])
-        
-        list_clus_belong_real_photos = self.ReadDGTFile(name_topic,num_topic,file_path)
-        print(list_clus_belong_real_photos[0])
-        
-
-        
-        return
-    
-
-    def ReadClustersFile(self,file_path):
-
-        # print(file_path)
-        # print(type(file_path))
-
-        cluster_file = open(file_path, 'r')
-
-        list_clus_belong_photos = []
-
-        count = 0
-        with open(file_path, 'r') as f:
-            for line in f:
-                count += 1.
-
-        #Read the first line, that is text
-        line = cluster_file.readline()
-
-        for i in range(0, int(count) - 1):
-
-            line = cluster_file.readline()
-            list_line = line.split('\t')
-            # print(list_line)
-            photo_id = list_line[0]
-            cluster_number = list_line[1]
-            def_list = [photo_id, cluster_number]    
-            list_clus_belong_photos.append(def_list)
-
-        cluster_file.close()
-
-        return (list_clus_belong_photos)
-
-
-    def Extract_Name_Number_Topic(self,file_txt_name):
-
-
-        list_name_file = file_txt_name.split('-')
-        num_topic = list_name_file[0]
-        name_topic = list_name_file[1]
-
-
-        return (name_topic, num_topic)
-
-
-    def ReadDGTFile(self,name_topic,num_topic,file_path):
-
-
-        if(int(num_topic) <= 70): #the file is in devset folder
-            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dGt.txt"
-        else:#the file is in testset folder
-            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dGt.txt"
-
-        dGT_file = open(filename, 'r')
-
-        list_clus_belong_photos = []
-
-        count = 0
-        with open(filename, 'r') as f:
-            for line in f:
-                count += 1.
-
-
-        for i in range(0, int(count)):
-
-            line = dGT_file.readline()
-            list_line = line.split(',')
-            photo_id = list_line[0]
-            cluster_number = list_line[1]
-            def_list = [photo_id, cluster_number]    
-            list_clus_belong_photos.append(def_list)
-
-        dGT_file.close()
-
-        return (list_clus_belong_photos)
-
-##-- End of Class 6: Win6 --##
 
 # ------------------------------------------
 
