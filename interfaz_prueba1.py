@@ -124,7 +124,7 @@ class Win1(Frame):
 class Win2():
 
 
-    def __init__(self, master, num_topic,editable_names,folder_topic):
+    def __init__(self, master, num_topic,editable_names,folder_topic,order_clusters):
 
         self.master = master
         self.frame = tk.Frame(self.master)
@@ -142,7 +142,7 @@ class Win2():
         list_images_resized =  self.ResizePhotos(list_images_url)
 
         name_topic = self.FrameUP(num_topic,Color_List)
-        self.FramesDown(list_images_url,num_topic,name_topic,Color_List,editable_names,list_images_resized)
+        self.FramesDown(list_images_url,num_topic,name_topic,Color_List,editable_names,list_images_resized,order_clusters)
     
 
         return
@@ -241,7 +241,7 @@ class Win2():
         return (name_topic)
 
 
-    def FramesDown(self,images_vector,num_topic, name_topic,Color_List,editable_names,images_vector_jpg):
+    def FramesDown(self,images_vector,num_topic, name_topic,Color_List,editable_names,images_vector_jpg,order_clusters):
         
         
         #Frame para el canvas
@@ -260,7 +260,30 @@ class Win2():
         frame_fotos = tk.Frame(GENERAL_CANVAS)
         GENERAL_CANVAS.create_window((0,0), window=frame_fotos, anchor='nw')
         
+        #Read rGT file
+        list_similarity = self.ReadRGTFile(num_topic,name_topic)
         
+
+        #Read dGT file
+        list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic)
+        
+        
+        if(order_clusters == 1):
+            # hacer lista de url desde el fichero de los clusters
+            # hacer lista de fotos
+            # hacer la lista de las fotos resized
+            print("jaja hola amigo")
+            list_url_img_DGT = self.MakeURLDGT(list_clus_belong_photos,num_topic,name_topic)
+
+        _num_fotos = 0#contador para las fotos
+        fotos_num = len(images_vector) #cuantos elementos hay en el vector
+
+        self.images_vector_jpg = images_vector_jpg
+
+        
+        number_of_1 = 0
+        number_of_0 = 0
+
         # #Grid for the photos
         # #Every Folder has 300 photos, so we make a 60x5 grid
         rows = 61
@@ -269,20 +292,6 @@ class Win2():
         frames_grid = [[Frame() for j in range(columns)] for i in range(rows)]
         canvas_grid = [[Canvas() for j in range(columns)] for i in range(rows)]
 
-        _num_fotos = 0#contador para las fotos
-        fotos_num = len(images_vector) #cuantos elementos hay en el vector
-
-        self.images_vector_jpg = images_vector_jpg
-
-        #Read rGT file
-        list_similarity = self.ReadRGTFile(num_topic,name_topic)
-        
-
-        #Read dGT file
-        list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic)
-
-        number_of_1 = 0
-        number_of_0 = 0
 
         for i in range (1, rows):
 
@@ -407,6 +416,7 @@ class Win2():
         explode = (0, 0)  # explode 1st slice
 
         # Plot
+        plt.figure(2)
         plt.pie(sizes, explode=explode, labels=labels, colors=colors,
         autopct='%1.1f%%', shadow=False, startangle=140)
 
@@ -414,6 +424,26 @@ class Win2():
         plt.show()
 
         return
+
+
+    def MakeURLDGT(self,list_clus_belong_photos,num_topic,name_topic):
+
+        size_list = len(list_clus_belong_photos)
+        list_dgt_url_images = []
+
+        for i in range(0,size_list):
+
+            _pack = list_clus_belong_photos[i]
+            id_photo_dgt = _pack[0]
+            image_path = URL_IMAGES + name_topic + "/" + id_photo_dgt + ".jpg"
+
+            list_dgt_url_images.append(image_path)
+
+
+        print(len(list_dgt_url_images))
+        print(list_dgt_url_images[0])
+        return
+
 
 
     def PieChartGraphicCluster(self,name_topic,num_topic,list_clus_belong_photos,Color_List):
@@ -431,15 +461,16 @@ class Win2():
             colors.append(Color_List[i])
             list_n_times.append(n_times)
 
-        labels = []
-        sizes = list_n_times
+        _labels = []
+        _sizes = list_n_times
 
         for j in range(0, len(list_clust)):
-            labels.append('Topic '+str(j+1)+ ": " +list_clust[j] +"(" +str(list_n_times[j])+")")
+            _labels.append('Topic '+str(j+1)+ ": " +list_clust[j] +"(" +str(list_n_times[j])+")")
         # explode = (0, 0)  # explode 1st slice
 
         # Plot
-        plt.pie(sizes,  labels=labels, colors=colors,
+        plt.figure(1)
+        plt.pie(_sizes,  labels=_labels, colors=colors,
         autopct='%1.1f%%', shadow=False, startangle=140)
 
         plt.axis('equal')
@@ -793,10 +824,11 @@ class Win3():
 
         # num_topic = self.NUM_TOPIC.get()
         editable_names = self.CheckVarEditable.get()
+        order_clusters = self.CheckVarClusters.get()
         root.filename =  filedialog.askdirectory()
         url_list = root.filename.split('/')
         folder_name = url_list[-1]
-        print(folder_name)
+        # print(folder_name)
 
         if(folder_name != ''):
 
@@ -820,7 +852,7 @@ class Win3():
             # self.new.attributes('-fullscreen',True)
             self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
             # self.new.geometry("640x640")
-            Win2(self.new, num_topic ,editable_names,root.filename)
+            Win2(self.new, num_topic ,editable_names,root.filename,order_clusters)
         else:
             print('Choose a folder!')
 
