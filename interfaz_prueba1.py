@@ -283,19 +283,18 @@ class Win2():
         self.images_vector_jpg = images_vector_jpg
 
         if(order_clusters == 1):
-            # hacer lista de url desde el fichero de los clusters
-            # hacer lista de fotos
-            # hacer la lista de las fotos resized
+
             columns = 6
-            rows = fotos_num % 5 + int(fotos_num / 5) + 1
+
+            if(fotos_num % 5 == 0):
+                rows = int(fotos_num / 5) + 1
+            else:
+                rows = int(fotos_num / 5) + 2
+
         else:
-            
 
             number_of_1 = 0
             number_of_0 = 0
-
-            # #Grid for the photos
-            # #Every Folder has 300 photos, so we make a 60x5 grid
             rows = 61
             columns = 6
 
@@ -360,6 +359,7 @@ class Win2():
                     
                     if(order_clusters == 0):
                         sim = self.SearchSimilarity(url_image,list_similarity)
+                        aux = False
                     else:
                         sim = 1
                         aux = True
