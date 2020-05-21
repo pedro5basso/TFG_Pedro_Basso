@@ -11,12 +11,16 @@ from tkinter import filedialog
 import webbrowser
 import csv
 import io
+import shutil
 
 
 ###---GLOBAL VARIABLES---###
 root = Tk()
 
 URL_IMAGES = 'C:/Users/Pedro/Desktop/TFG/Imagenes_TFG/'
+PORT = '61433'
+URL_PORT = "http://127.0.0.1:" + PORT + "/index.html"
+URL_D3_FILES = 'C:/Users/Pedro/Desktop/TFG/Code_Python/d3/files/'
 
 #variables for screen dimension
 width_window = 350
@@ -987,20 +991,144 @@ class Win4():
     def CheckClustersWindow(self):
 
 
-        # root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select Cluster file",filetypes = ((".txt files","*.txt"),("all files","*.*")))
-        # url_list = root.filename.split('/')
-        # file_txt_name = url_list[-1]
+        root.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select Cluster file",filetypes = ((".txt files","*.txt"),("all files","*.*")))
+        url_list = root.filename.split('/')
+        file_txt_name = url_list[-1]
         # self.new = Toplevel(self.master)
         # self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
         # # self.new.geometry("640x640")
         # self.new.grid()
         # Win6(self.new,file_txt_name,root.filename)
+
+        self.MakeSpecificFiles(file_txt_name,root.filename)
+
+        return
+
+
+    def MakeSpecificFiles(self,file_txt_name,filename_path):
+
+        name_topic,num_topic = self.Extract_Name_Number_Topic(file_txt_name)
         
+        # Once we have number and name of the topic, we read the selected file, and  dGT and dcluster files of the topic
+        # with specifications: add the first line and copying them to a specific folder
+
+        self.MakeSpecificdGTFile(name_topic,num_topic)
+
+        self.MakeSpecificdClusterFile(name_topic,num_topic)
+
+        self.MakeSecificSelectedFile(filename_path)
+
+        self.RunHtml()
+
+        return
+
+
+    def MakeSpecificdGTFile(self,name_topic,num_topic):
+
+
+        if(int(num_topic) <= 70): #the file is in devset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dGt.txt"
+        else:#the file is in testset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dGt.txt"
+
+
+
+        # try:
+        #     count = 0 
+        #     with io.open(filename, 'r', encoding = "utf-16") as f:
+        #         for line in f:
+        #             count += 1.
+
+        #     dGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        # except:
+        #     count = 0 
+        #     with open(filename, 'r') as f:
+        #         for line in f:
+        #             count += 1.
+
+        #     dGT_file = io.open(filename, 'r')
+
+
+        # ------
+
+        src=open(filename,"r")
+        fline="ID_Photo,ID_Cluster\n" #Geader of thr file
+        oline=src.readlines()
+        #Here, we prepend the string we want to on first line
+        oline.insert(0,fline)
+        src.close()
+        
+        
+        #We again open the file in WRITE mode 
+        src=open(filename,"w")
+        src.writelines(oline)
+        old_path = filename
+        path_new = URL_D3_FILES + 'filedGT.txt'
+        src.close()
+
+        shutil.copy(old_path, path_new)
+
+
+        return
+
+
+
+    def MakeSpecificdClusterFile(self,name_topic,num_topic):
+
+        if(int(num_topic) <= 70): #the file is in devset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dclusterGt.txt"
+        else:#the file is in testset folder
+            filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dclusterGt.txt"
+
+
+        src=open(filename,"r")
+        fline="Cluster_Number,Cluster_Name\n" #Geader of thr file
+        oline=src.readlines()
+        #Here, we prepend the string we want to on first line
+        oline.insert(0,fline)
+        src.close()
+        
+        
+        #We again open the file in WRITE mode 
+        src=open(filename,"w")
+        src.writelines(oline)
+        old_path = filename
+        path_new = URL_D3_FILES + 'filedclusterGT.txt'
+        src.close()
+
+        shutil.copy(old_path, path_new)
+
+        return
+
+
+    def MakeSecificSelectedFile(self,filename_path):
+
+
+        old_path = filename_path
+        path_new = URL_D3_FILES + 'fileClusters.txt'
+
+        shutil.copy(old_path, path_new)
+
+
+        return
+
+
+    def Extract_Name_Number_Topic(self,file_txt_name):
+
+
+        list_name_file = file_txt_name.split('-')
+        num_topic = list_name_file[0]
+        name_topic = list_name_file[1]
+
+
+        return (name_topic, num_topic)
+
+    def RunHtml(self):
 
         new = 2
-        url = "http://127.0.0.1:58330/index.html"
+        url = "http://127.0.0.1:61433/index.html"
         webbrowser.open(url,new=new)
-
 
         return
 
@@ -1771,12 +1899,10 @@ class Win6():
         name_topic,num_topic = self.Extract_Name_Number_Topic(file_txt_name)
         
         list_clus_belong_photos = self.ReadClustersFile(file_path)
+        print(list_clus_belong_photos[0])
         
         list_clus_belong_real_photos = self.ReadDGTFile(name_topic,num_topic,file_path)
-
-        # list_resized_photos =  self.ResizePhotos(list_clus_belong_real_photos,name_topic)
-
-        # self.SetImagesClusterFile(name_topic,list_clus_belong_photos,list_resized_photos)
+        print(list_clus_belong_real_photos[0])
         
 
         
