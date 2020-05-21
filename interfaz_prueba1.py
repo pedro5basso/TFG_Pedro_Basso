@@ -138,11 +138,26 @@ class Win2():
                         'mediumaquamarine', 'turquoise', 'paleturquoise', 'darkcyan','aqua','deepskyblue', 'steelblue', 
                         'dodgerblue', 'blueviolet','magenta', 'mediumvioletred',  'hotpink', 'crimson', 'pink']
 
-        list_images_url = self.Reading_folder_images(num_topic,folder_topic)
-        list_images_resized =  self.ResizePhotos(list_images_url)
-
         name_topic = self.FrameUP(num_topic,Color_List)
-        self.FramesDown(list_images_url,num_topic,name_topic,Color_List,editable_names,list_images_resized,order_clusters)
+
+        #Read rGT file
+        list_similarity = self.ReadRGTFile(num_topic,name_topic)
+        
+
+        #Read dGT file
+        list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic)
+
+
+        if(order_clusters == 0):
+            list_images_url = self.Reading_folder_images(num_topic,folder_topic)
+            list_images_resized =  self.ResizePhotos(list_images_url)
+
+
+        if(order_clusters == 1):
+            list_images_url = self.MakeURLDGT(list_clus_belong_photos,name_topic)
+            list_images_resized =  self.ResizePhotos(list_images_url)
+        
+        self.FramesDown(list_images_url,num_topic,name_topic,Color_List,editable_names,list_images_resized,order_clusters,list_similarity,list_clus_belong_photos)
     
 
         return
@@ -151,9 +166,10 @@ class Win2():
     def ResizePhotos(self,list_url_images):
 
         list_photo_type = []
-        img_type = 0 
+        img_type = 0
+        size_list = len(list_url_images)
 
-        for i in range(0, len(list_url_images)):
+        for i in range(0, size_list):
 
             img = Image.open(list_url_images[i])
 
@@ -241,7 +257,7 @@ class Win2():
         return (name_topic)
 
 
-    def FramesDown(self,images_vector,num_topic, name_topic,Color_List,editable_names,images_vector_jpg,order_clusters):
+    def FramesDown(self,images_vector,num_topic, name_topic,Color_List,editable_names,images_vector_jpg,order_clusters,list_similarity,list_clus_belong_photos):
         
         
         #Frame para el canvas
@@ -260,34 +276,29 @@ class Win2():
         frame_fotos = tk.Frame(GENERAL_CANVAS)
         GENERAL_CANVAS.create_window((0,0), window=frame_fotos, anchor='nw')
         
-        #Read rGT file
-        list_similarity = self.ReadRGTFile(num_topic,name_topic)
+       
         
+        _num_fotos = 0#contador para las fotos
+        fotos_num = len(images_vector) #cuantos elementos hay en el vector
+        self.images_vector_jpg = images_vector_jpg
 
-        #Read dGT file
-        list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic)
-        
-        
         if(order_clusters == 1):
             # hacer lista de url desde el fichero de los clusters
             # hacer lista de fotos
             # hacer la lista de las fotos resized
-            print("jaja hola amigo")
-            list_url_img_DGT = self.MakeURLDGT(list_clus_belong_photos,num_topic,name_topic)
+            columns = 6
+            rows = fotos_num % 5 + int(fotos_num / 5) + 1
+        else:
+            
 
-        _num_fotos = 0#contador para las fotos
-        fotos_num = len(images_vector) #cuantos elementos hay en el vector
+            number_of_1 = 0
+            number_of_0 = 0
 
-        self.images_vector_jpg = images_vector_jpg
+            # #Grid for the photos
+            # #Every Folder has 300 photos, so we make a 60x5 grid
+            rows = 61
+            columns = 6
 
-        
-        number_of_1 = 0
-        number_of_0 = 0
-
-        # #Grid for the photos
-        # #Every Folder has 300 photos, so we make a 60x5 grid
-        rows = 61
-        columns = 6
 
         frames_grid = [[Frame() for j in range(columns)] for i in range(rows)]
         canvas_grid = [[Canvas() for j in range(columns)] for i in range(rows)]
@@ -346,28 +357,30 @@ class Win2():
                     _lbl_cluster = tk.Label(frames_grid[i][j])
                     _lbl_cluster.grid(row=1, column=2, sticky='w')
 
-                    sim = self.SearchSimilarity(url_image,list_similarity)
-                    if(sim == 1):
-                        number_of_1 += 1
+                    
+                    if(order_clusters == 0):
+                        sim = self.SearchSimilarity(url_image,list_similarity)
+                    else:
+                        sim = 1
+                        aux = True
+
 
                     if(sim == 0):
-                        number_of_0 += 1
-                    
-                    # print(sim_pack[0])
 
-                    if(sim != 1):
-                        # print(sim_pack[0])
-                        # print("soy 0")
+                        number_of_0 += 1
 
                         canvas_grid[i][j].config(bg='white')            
                             
                         bckgrnd_lbl = 'red'
                         _lbl_number.config(bg=bckgrnd_lbl)
 
-                        _lbl_cluster.config(text="No Cluster", bg='black', fg='white')   
+                        _lbl_cluster.config(text="No Cluster", bg='black', fg='white')
+
                     else:
-                        # print("soy 1")
-                        #Background for the image                        
+                        
+                        if(not aux):
+                            number_of_1 += 1
+
                         color_bckgrn,number_cluster = self.SetColorCluster(url_image,list_clus_belong_photos,Color_List)
                         canvas_grid[i][j].config(bg=color_bckgrn)
 
@@ -400,8 +413,9 @@ class Win2():
         btt_grapics_clusters = Button(self.frame, text="Pie Chart Clusters", command = lambda: self.PieChartGraphicCluster(name_topic,num_topic,list_clus_belong_photos,Color_List))
         btt_grapics_clusters.grid(row=2,column=2)
 
-        btt_graphics_similarity = Button(self.frame, text="Pie Chart Similarity", command = lambda: self.PieChartGraphicSimilarity(number_of_1,number_of_0))
-        btt_graphics_similarity.grid(row=2,column=1)
+        if(order_clusters == 0):
+            btt_graphics_similarity = Button(self.frame, text="Pie Chart Similarity", command = lambda: self.PieChartGraphicSimilarity(number_of_1,number_of_0))
+            btt_graphics_similarity.grid(row=2,column=1)
 
         return
 
@@ -426,9 +440,10 @@ class Win2():
         return
 
 
-    def MakeURLDGT(self,list_clus_belong_photos,num_topic,name_topic):
+    def MakeURLDGT(self,list_clus_belong_photos,name_topic):
 
         size_list = len(list_clus_belong_photos)
+        
         list_dgt_url_images = []
 
         for i in range(0,size_list):
@@ -440,9 +455,8 @@ class Win2():
             list_dgt_url_images.append(image_path)
 
 
-        print(len(list_dgt_url_images))
-        print(list_dgt_url_images[0])
-        return
+        
+        return(list_dgt_url_images)
 
 
 
