@@ -12,6 +12,9 @@ import webbrowser
 import csv
 import io
 import shutil
+import socketserver
+import socket
+import sys
 
 
 ###---GLOBAL VARIABLES---###
@@ -151,31 +154,38 @@ class Win2():
         #Read dGT file
         list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic)
 
+        # print(len(list_clus_belong_photos))
+
 
         if(order_clusters == 0):
+            aux = 0
             list_images_url = self.Reading_folder_images(num_topic,folder_topic)
-            list_images_resized =  self.ResizePhotos(list_images_url)
+            list_images_resized =  self.ResizePhotos(list_images_url,aux)
 
 
         if(order_clusters == 1):
+            aux = 1
             list_images_url = self.MakeURLDGT(list_clus_belong_photos,name_topic)
-            list_images_resized =  self.ResizePhotos(list_images_url)
+            list_images_resized =  self.ResizePhotos(list_images_url,aux)
         
+
         self.FramesDown(list_images_url,num_topic,name_topic,Color_List,editable_names,list_images_resized,order_clusters,list_similarity,list_clus_belong_photos)
     
 
         return
 
 
-    def ResizePhotos(self,list_url_images):
+    def ResizePhotos(self,list_url_images,order_clusters):
 
         list_photo_type = []
         img_type = 0
-        size_list = len(list_url_images)
+        size_original_list = len(list_url_images)
+            
 
-        for i in range(0, size_list):
+        for i in range(0, size_original_list):
 
             img = Image.open(list_url_images[i])
+
 
             width,height = img.size
 
@@ -280,11 +290,10 @@ class Win2():
         frame_fotos = tk.Frame(GENERAL_CANVAS)
         GENERAL_CANVAS.create_window((0,0), window=frame_fotos, anchor='nw')
         
-       
         
         _num_fotos = 0#contador para las fotos
-        fotos_num = len(images_vector) #cuantos elementos hay en el vector
         self.images_vector_jpg = images_vector_jpg
+        fotos_num = len(self.images_vector_jpg)
 
         if(order_clusters == 1):
 
@@ -294,7 +303,7 @@ class Win2():
                 rows = int(fotos_num / 5) + 1
             else:
                 rows = int(fotos_num / 5) + 2
-
+            
         else:
 
             number_of_1 = 0
@@ -302,7 +311,8 @@ class Win2():
             rows = 61
             columns = 6
 
-
+        
+        images_vector_url = images_vector
         frames_grid = [[Frame() for j in range(columns)] for i in range(rows)]
         canvas_grid = [[Canvas() for j in range(columns)] for i in range(rows)]
 
@@ -319,7 +329,7 @@ class Win2():
 
                 if(_num_fotos <= fotos_num):
 
-                    url_image = self.ExtractPhoto_fromUrl(images_vector[_num_fotos - 1])
+                    url_image = self.ExtractPhoto_fromUrl(images_vector_url[_num_fotos - 1])
 
                     canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300)
                     canvas_grid[i][j].grid(row=0, column=0, columnspan=3)
@@ -472,7 +482,9 @@ class Win2():
         list_n_times = []
         colors = []
 
+        length = len(list_clus_belong_photos)
         clusters_numbers = [int(i[1]) for i in list_clus_belong_photos]
+        
 
         for i in range(0,num_clust):
             n_times = clusters_numbers.count(i+1)
@@ -535,6 +547,7 @@ class Win2():
         search = False
         size_list = len(list_clus_belong_photos)
         counter = 0
+        # size_list -=1
         while((counter < size_list) and (not search)):
 
             aux = list_clus_belong_photos[counter]
@@ -545,19 +558,16 @@ class Win2():
                 search = True
 
             counter += 1
-
-
+        
         if(search):
+
             aux_ = list_clus_belong_photos[index]
             number_cluster = aux_[1]
-            #Then associate the image with their color cluster
-            color = Color_List[int(number_cluster) - 1]
-        # else:
-        #     color = 'white'
-        #     # print("estoy mal")
-        #     # print(url_image)
-        #     number_cluster = 0
 
+            try:         
+                color = Color_List[int(number_cluster) - 1]
+            except:
+                color = Color_List[0]
 
         return(color,number_cluster)
 
@@ -643,13 +653,25 @@ class Win2():
 
         list_cluster_topic = []
 
+        fline="Cluster_Number,Cluster_Name\n"
+        first_line = dclusterGT_file.readline()
+
+        if(first_line == fline):
+            aux = True
+        else:
+            aux = False
+
         for i in range(0, int(count)):
 
-            line = dclusterGT_file.readline()
-            list_line = line.split(',')
-            list_cluster_topic.append(list_line[1])
+            if(aux == False):
 
+                line = dclusterGT_file.readline()
+                list_line = line.split(',')
+                list_cluster_topic.append(list_line[1])
+            else:
+                aux = False
 
+    
         dclusterGT_file.close()
 
         return (list_cluster_topic)
@@ -680,16 +702,30 @@ class Win2():
 
         list_clus_belong_photos = []
 
+        fline="ID_Photo,ID_Cluster\n"
+        first_line = dGT_file.readline()
+
+        if(first_line == fline):
+            aux = True
+        else:
+            aux = False
+
+        
         for i in range(0, int(count)):
 
-            line = dGT_file.readline()
-            list_line = line.split(',')
-            photo_id = list_line[0]
-            cluster_number = list_line[1]
-            def_list = [photo_id, cluster_number]    
-            list_clus_belong_photos.append(def_list)
+            if(aux == False):
+                line = dGT_file.readline()
+                list_line = line.split(',')
+                photo_id = list_line[0]
+                cluster_number = list_line[1]
+                def_list = [photo_id, cluster_number]    
+                list_clus_belong_photos.append(def_list)
+            else:
+                aux = False
 
         dGT_file.close()
+
+        # print(len(list_clus_belong_photos))
 
         return (list_clus_belong_photos)
 
@@ -840,10 +876,12 @@ class Win3():
 
     def ResultsWindow(self):
 
+        
         # num_topic = self.NUM_TOPIC.get()
         editable_names = self.CheckVarEditable.get()
         order_clusters = self.CheckVarClusters.get()
         root.filename =  filedialog.askdirectory()
+        
         url_list = root.filename.split('/')
         folder_name = url_list[-1]
         # print(folder_name)
@@ -860,16 +898,10 @@ class Win3():
                 if(list_line[1] == folder_name):
                     num_topic = list_line[0]
             
-            
-
-
-            # if(num_topic==''):
-            #     self.Error_window()
-            # else:
             self.new = Toplevel(self.master)
             # self.new.attributes('-fullscreen',True)
             self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
-            # self.new.geometry("640x640")
+            # self.new.geometry("640x640")            
             Win2(self.new, num_topic ,editable_names,root.filename,order_clusters)
         else:
             print('Choose a folder!')
@@ -1048,19 +1080,26 @@ class Win4():
         # ------
 
         src=open(filename,"r")
-        fline="ID_Photo,ID_Cluster\n" #Geader of thr file
-        oline=src.readlines()
-        #Here, we prepend the string we want to on first line
-        oline.insert(0,fline)
-        src.close()
+        first_line = src.readline()
+        if(first_line == "ID_Photo,ID_Cluster\n"):
+            src.close()
+        else:
+
+            fline="ID_Photo,ID_Cluster\n" #Geader of thr file
+            oline=src.readlines()
+            #Here, we prepend the string we want to on first line
+            oline.insert(0,fline)
+            src.close()
+            src=open(filename,"w")
+            src.writelines(oline)
+            
+            src.close()
         
         
-        #We again open the file in WRITE mode 
-        src=open(filename,"w")
-        src.writelines(oline)
+        #We again open the file in WRITE mode
         old_path = filename
         path_new = URL_D3_FILES + 'filedGT.txt'
-        src.close()
+        
 
         shutil.copy(old_path, path_new)
 
@@ -1078,19 +1117,24 @@ class Win4():
 
 
         src=open(filename,"r")
-        fline="Cluster_Number,Cluster_Name\n" #Geader of thr file
-        oline=src.readlines()
-        #Here, we prepend the string we want to on first line
-        oline.insert(0,fline)
-        src.close()
+        first_line = src.readline()
+        if(first_line == "Cluster_Number,Cluster_Name\n"):
+            src.close()
+        else:
+            fline="Cluster_Number,Cluster_Name\n" #Geader of thr file
+            oline=src.readlines()
+            #Here, we prepend the string we want to on first line
+            oline.insert(0,fline)
+            src.close()
+            src=open(filename,"w")
+            src.writelines(oline)
+            
+            src.close()
         
         
         #We again open the file in WRITE mode 
-        src=open(filename,"w")
-        src.writelines(oline)
         old_path = filename
         path_new = URL_D3_FILES + 'filedclusterGT.txt'
-        src.close()
 
         shutil.copy(old_path, path_new)
 
@@ -1119,11 +1163,45 @@ class Win4():
 
         return (name_topic, num_topic)
 
+    
+
     def RunHtml(self):
 
+
+        # HOST, PORT = "localhost", 9999
+
+        # # Create the server, binding to localhost on port 9999
+        # server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
+
+        # # Activate the server; this will keep running until you
+        # # interrupt the program with Ctrl-C
+        # server.serve_forever()
+
+        # data = " ".join(sys.argv[1:])
+
+        # # Create a socket (SOCK_STREAM means a TCP socket)
+        # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # # Connect to server and send data
+        # sock.connect((HOST, PORT))
+        # sock.send(bytes(data + "\n","utf8"))
+
+        # # Receive data from the server and shut down
+        # received = sock.recv(1024)
+        # sock.close()
+
+        
+ 
+        HOST, PORT = "localhost", 50309
+        
+        # socket = MySocket()
+        # socket.connect(HOST, PORT)
+
+
         new = 2
-        url = "http://127.0.0.1:61433/index.html"
+        url = "http://"+HOST+":"+str(PORT)+"/index.html"
         webbrowser.open(url,new=new)
+        # socket.myreceive()
 
         return
 
@@ -1882,6 +1960,9 @@ class Win5():
 ##-- End of Class 5: Win5 --##
 
 # ------------------------------------------
+
+
+
 
 root.geometry("%dx%d+%d+%d" % (width_window,height_window,coordinate_x,coordinate_y))
 
