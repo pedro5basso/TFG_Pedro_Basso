@@ -1222,7 +1222,7 @@ class Win4():
 
         
  
-        HOST, PORT = "localhost", 62577
+        HOST, PORT = "localhost", 55743
         
         # socket = MySocket()
         # socket.connect(HOST, PORT)
