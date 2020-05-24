@@ -653,23 +653,15 @@ class Win2():
 
         list_cluster_topic = []
 
-        fline="Cluster_Number,Cluster_Name\n"
-        first_line = dclusterGT_file.readline()
 
-        if(first_line == fline):
-            aux = True
-        else:
-            aux = False
 
         for i in range(0, int(count)):
 
-            if(aux == False):
 
-                line = dclusterGT_file.readline()
-                list_line = line.split(',')
-                list_cluster_topic.append(list_line[1])
-            else:
-                aux = False
+            line = dclusterGT_file.readline()
+            list_line = line.split(',')
+            list_cluster_topic.append(list_line[1])
+
 
     
         dclusterGT_file.close()
@@ -702,30 +694,19 @@ class Win2():
 
         list_clus_belong_photos = []
 
-        fline="ID_Photo,ID_Cluster\n"
-        first_line = dGT_file.readline()
-
-        if(first_line == fline):
-            aux = True
-        else:
-            aux = False
-
         
         for i in range(0, int(count)):
-
-            if(aux == False):
-                line = dGT_file.readline()
-                list_line = line.split(',')
-                photo_id = list_line[0]
-                cluster_number = list_line[1]
-                def_list = [photo_id, cluster_number]    
-                list_clus_belong_photos.append(def_list)
-            else:
-                aux = False
+            
+            line = dGT_file.readline()
+            list_line = line.split(',')
+            photo_id = list_line[0]
+            cluster_number = list_line[1]
+            def_list = [photo_id, cluster_number]    
+            list_clus_belong_photos.append(def_list)
+            
 
         dGT_file.close()
 
-        # print(len(list_clus_belong_photos))
 
         return (list_clus_belong_photos)
 
@@ -1039,11 +1020,11 @@ class Win4():
         # Once we have number and name of the topic, we read the selected file, and  dGT and dcluster files of the topic
         # with specifications: add the first line and copying them to a specific folder
 
-        self.MakeSpecificdGTFile(name_topic,num_topic)
+        list_dgt = self.MakeSpecificdGTFile(name_topic,num_topic)
 
         self.MakeSpecificdClusterFile(name_topic,num_topic)
 
-        self.MakeSecificSelectedFile(filename_path)
+        self.MakeSecificSelectedFile(filename_path,list_dgt)
 
         self.RunHtml()
 
@@ -1053,97 +1034,168 @@ class Win4():
     def MakeSpecificdGTFile(self,name_topic,num_topic):
 
 
+        FILE_TO_MODIFY = 'C:/Users/Pedro/Desktop/TFG/Code_Python/d3/files/filedGT.txt'
+
+        list_file = self.ReadDGTFile(num_topic,name_topic)
+
+        with open(FILE_TO_MODIFY, 'w') as f:
+            for item in list_file:
+                f.write("%s" % item)
+
+
+        src=open(FILE_TO_MODIFY,"r")
+        fline="ID_Photo,ID_Cluster\n"    #Prepending string
+        oline=src.readlines()
+        #Here, we prepend the string we want to on first line
+        oline.insert(0,fline)
+        src.close()
+        
+        
+        #We again open the file in WRITE mode 
+        src=open(FILE_TO_MODIFY,"w")
+        src.writelines(oline)
+        src.close()
+
+        return(list_file)
+
+
+
+    def ReadDGTFile(self,num_topic,name_topic):
+
         if(int(num_topic) <= 70): #the file is in devset folder
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dGt.txt"
         else:#the file is in testset folder
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dGt.txt"
 
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
+
+            dGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            dGT_file = io.open(filename, 'r')
+
+        list_clus_belong_photos = []
 
 
-        # try:
-        #     count = 0 
-        #     with io.open(filename, 'r', encoding = "utf-16") as f:
-        #         for line in f:
-        #             count += 1.
+        for i in range(0, int(count)):
 
-        #     dGT_file = io.open(filename, 'r', encoding = "utf-16")
-
-        # except:
-        #     count = 0 
-        #     with open(filename, 'r') as f:
-        #         for line in f:
-        #             count += 1.
-
-        #     dGT_file = io.open(filename, 'r')
-
-
-        # ------
-
-        src=open(filename,"r")
-        first_line = src.readline()
-        if(first_line == "ID_Photo,ID_Cluster\n"):
-            src.close()
-        else:
-
-            fline="ID_Photo,ID_Cluster\n" #Geader of thr file
-            oline=src.readlines()
-            #Here, we prepend the string we want to on first line
-            oline.insert(0,fline)
-            src.close()
-            src=open(filename,"w")
-            src.writelines(oline)
+            line = dGT_file.readline()
+    
+            list_line = line.split(',')                  
+            photo_id = list_line[0]             
+            cluster_number = list_line[1]
+            def_list = photo_id+','+cluster_number
+            list_clus_belong_photos.append(def_list)
             
-            src.close()
-        
-        
-        #We again open the file in WRITE mode
-        old_path = filename
-        path_new = URL_D3_FILES + 'filedGT.txt'
-        
+        dGT_file.close()
 
-        shutil.copy(old_path, path_new)
+        return (list_clus_belong_photos)
 
+    
+
+    def MakeSpecificdClusterFile(self,name_topic,num_topic):
+
+        FILE_TO_MODIFY = 'C:/Users/Pedro/Desktop/TFG/Code_Python/d3/files/filedclusterGT.txt'
+
+        list_file = self.ReadDclusterGT(num_topic,name_topic)
+        # print(list_file)
+
+        with open(FILE_TO_MODIFY, 'w') as f:
+            for item in list_file:
+                f.write("%s" % item)
+
+
+        src=open(FILE_TO_MODIFY,"r")
+        fline="Cluster_Number,Cluster_Name\n"    #Prepending string
+        oline=src.readlines()
+        #Here, we prepend the string we want to on first line
+        oline.insert(0,fline)
+        src.close()
+        
+        #We again open the file in WRITE mode 
+        src=open(FILE_TO_MODIFY,"w")
+        src.writelines(oline)
+        src.close()
 
         return
 
 
-
-    def MakeSpecificdClusterFile(self,name_topic,num_topic):
+    def ReadDclusterGT(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70): #the file is in devset folder
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/devset/dGT/" + name_topic + " dclusterGt.txt"
         else:#the file is in testset folder
             filename = "C:/Users/Pedro/Desktop/TFG/b/gt/testset/dGT/" + name_topic + " dclusterGt.txt"
-
-
-        src=open(filename,"r")
-        first_line = src.readline()
-        if(first_line == "Cluster_Number,Cluster_Name\n"):
-            src.close()
-        else:
-            fline="Cluster_Number,Cluster_Name\n" #Geader of thr file
-            oline=src.readlines()
-            #Here, we prepend the string we want to on first line
-            oline.insert(0,fline)
-            src.close()
-            src=open(filename,"w")
-            src.writelines(oline)
-            
-            src.close()
         
+
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
+
+            dclusterGT_file = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            dclusterGT_file = io.open(filename, 'r')
+
+        list_cluster_topic = []
+
+
+        for i in range(0, int(count)):
+
+            line = dclusterGT_file.readline()
+            list_line = line.split(',')
+            number = list_line[0]
+            name =  list_line[1]
+            def_list = number+','+name
+            list_cluster_topic.append(def_list)
+            
+    
+        dclusterGT_file.close()
+
+        return (list_cluster_topic)
+
+
+    def MakeSecificSelectedFile(self,filename_path,list_dgt):
+
+
+        list_clusters = self.BuildClusterDefFile(filename_path,list_dgt)
+
+        FILE_TO_MODIFY = 'C:/Users/Pedro/Desktop/TFG/Code_Python/d3/files/combinedClusterFile.txt'
+
+        with open(FILE_TO_MODIFY, 'w') as f:
+            for item in list_clusters:
+                f.write("%s" % item)
+
+
+        src=open(FILE_TO_MODIFY,"r")
+        fline="ID_Photo,ID_RCluster,ID_ECluster\n"    #Prepending string
+        oline=src.readlines()
+        #Here, we prepend the string we want to on first line
+        oline.insert(0,fline)
+        src.close()
         
         #We again open the file in WRITE mode 
-        old_path = filename
-        path_new = URL_D3_FILES + 'filedclusterGT.txt'
-
-        shutil.copy(old_path, path_new)
-
-        return
-
-
-    def MakeSecificSelectedFile(self,filename_path):
-
-
+        src=open(FILE_TO_MODIFY,"w")
+        src.writelines(oline)
+        src.close()
+        
+        
         old_path = filename_path
         path_new = URL_D3_FILES + 'fileClusters.txt'
 
@@ -1151,6 +1203,91 @@ class Win4():
 
 
         return
+
+
+    def BuildClusterDefFile(self,filename_path,list_dgt):
+
+
+        list_examination_cluster = self.ReadClusterFile(filename_path)
+
+        size_list_solution = len(list_dgt)
+        size_list_ex = len(list_examination_cluster)
+        counter1 = 0
+        
+
+        #Format: ID_PHOTO,ID_RCluster,ID_FCluster
+        # 12321232,2,10
+        def_list_cluster = []
+
+
+        while(counter1 < size_list_solution):
+
+            # Extract the photo and cluster from the dgt list
+            comb_r = list_dgt[counter1]
+            comb_r_ = comb_r.split(',')
+            id_photo_r = comb_r_[0]
+            id_cluster_r = int(comb_r_[-1])
+
+
+            # init iterators
+            search = False
+            counter2 = 1 #first line in the file is the header
+
+            while((counter2 < size_list_ex) and (not search)):
+                
+                # Extract img from the other list
+                comb_e = list_examination_cluster[counter2]
+                id_photo_e = comb_e[0]
+                if(int(id_photo_r) == int(id_photo_e)):
+                    id_cluster_e = comb_e[1]                  
+                    def_list = id_photo_r+','+str(id_cluster_r)+','+id_cluster_e
+                    def_list_cluster.append(def_list)
+                    search = True
+
+                counter2 += 1
+            
+            counter1 += 1
+
+
+
+        return(def_list_cluster)
+
+    def ReadClusterFile(self,filename):
+
+
+        try:
+            count = 0 
+            with io.open(filename, 'r', encoding = "utf-16") as f:
+                for line in f:
+                    count += 1.
+
+            ClusterFile = io.open(filename, 'r', encoding = "utf-16")
+
+        except:
+            count = 0 
+            with open(filename, 'r') as f:
+                for line in f:
+                    count += 1.
+
+            ClusterFile = io.open(filename, 'r')
+
+        list_clus_belong_photos = []
+
+
+        for i in range(0, int(count)):
+
+            line = ClusterFile.readline()
+    
+            list_line = line.split('\t')                  
+            photo_id = list_line[0]             
+            cluster_number = list_line[1]
+            def_list = [photo_id,cluster_number]
+            list_clus_belong_photos.append(def_list)
+            
+        ClusterFile.close()
+
+
+        return(list_clus_belong_photos)
 
 
     def Extract_Name_Number_Topic(self,file_txt_name):
@@ -1165,43 +1302,11 @@ class Win4():
 
     
 
-    def RunHtml(self):
-
-
-        # HOST, PORT = "localhost", 9999
-
-        # # Create the server, binding to localhost on port 9999
-        # server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
-
-        # # Activate the server; this will keep running until you
-        # # interrupt the program with Ctrl-C
-        # server.serve_forever()
-
-        # data = " ".join(sys.argv[1:])
-
-        # # Create a socket (SOCK_STREAM means a TCP socket)
-        # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        # # Connect to server and send data
-        # sock.connect((HOST, PORT))
-        # sock.send(bytes(data + "\n","utf8"))
-
-        # # Receive data from the server and shut down
-        # received = sock.recv(1024)
-        # sock.close()
-
-        
- 
-        HOST, PORT = "localhost", 50309
-        
-        # socket = MySocket()
-        # socket.connect(HOST, PORT)
-
+    def RunHtml(self): 
 
         new = 2
-        url = "http://"+HOST+":"+str(PORT)+"/index.html"
+        url = 'http://localhost:61366/index.html'
         webbrowser.open(url,new=new)
-        # socket.myreceive()
 
         return
 
@@ -1726,10 +1831,6 @@ class Win5():
         btt_pie_chart = Button(self.master, text="Pie Chart Similarity", command= lambda: self.MakePieChart(precission_list,number_of_ones))
         btt_pie_chart.grid(row=2,column=3)
 
-        
-        # print(len(precission_list))
-        # print(len(F1_score_list))
-        # print(len(Cust_recall_graphic_list))
         #End loop For------------------
 
         
@@ -1897,8 +1998,6 @@ class Win5():
         return (list_similarity)
 
 
-
-
     def NameTopic(self, num_topic):
 
         file_topics_numbers = open("C:/Users/Pedro/Desktop/TFG/b/gt/all_topics.txt","r")
@@ -1960,9 +2059,6 @@ class Win5():
 ##-- End of Class 5: Win5 --##
 
 # ------------------------------------------
-
-
-
 
 root.geometry("%dx%d+%d+%d" % (width_window,height_window,coordinate_x,coordinate_y))
 
