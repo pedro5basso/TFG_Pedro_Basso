@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="style.css" rel="stylesheet">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+  <script src="script.js"></script>
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <title>Cluster Representation</title>
+</head>
+<body>
+    
+<div id="General">
+  <div id="controls">
+    <span>
+      <label><input id="combine" type="radio" name="grouping" value="combine" checked>Combine</label>
+      <label><input id="solutions" type="radio" name="grouping" value="solutions">Solutions</label>
+      <label><input id="file" type="radio" name="grouping" value="file">File</label>
+    </span>
+    <span>
+      <label><input id="colors" type="radio" name="fill" value="colors" checked>Colors Solution</label>
+      <label><input id="colorsfile" type="radio" name="fill" value="flags">Colors File</label>
+    </span>
+  </div>
+  <div id="country-info"></div>
+
+  <div id="combo">
+    <div id="info_clusters">
+      <ol id="ClustList"></ol>
+      
+    </div>
+    
+    <div id="bubble-chart"></div>
+  </div>
+
+</div>
+
+<script>
+    
+  d3.queue()
+    .defer(d3.csv, "countries.csv")
+    .defer(d3.csv, "files/filedGT.txt")
+    .defer(d3.csv, "files/filedclusterGT.txt")
+    .defer(d3.tsv, "files/fileClusters.txt")
+    .defer(d3.csv, "files/combinedClusterFile.txt")
+    .await(createBubbleChart);
+
+
+</script>
+
+</body>
+</html>

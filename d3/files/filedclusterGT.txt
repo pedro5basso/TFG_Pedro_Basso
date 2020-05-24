@@ -1,0 +1,25 @@
+Cluster_Number,Cluster_Name
+1,trucks angle view
+2,trucks approached view
+3,trucks side view
+4,yellow car
+5,cars angle view
+6,cars approached view
+7,cars side view
+8,small cars
+9,beach view
+10,trucks distant view
+11,crowd
+12,cars crowd view
+13,people
+14,cars partial view
+15,trucks frontal view
+16,top view
+17,cars and people
+18,cars in focus
+19,trucks obstructed view
+20,motorcycles and people
+21,ATV
+22,motorcycles angle view
+23,motorcycles side view
+24,motorcycles approached view
