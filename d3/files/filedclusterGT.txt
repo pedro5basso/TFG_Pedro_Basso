@@ -1,0 +1,15 @@
+Cluster_Number,Cluster_Name
+1,Professional Photo
+2,Close up
+3,Top View Round Pot
+4,Flowers Full Frame
+5,Square Pots
+6,Rock Pot
+7,Metalic Pot
+8,Garden
+9,Decorated Pots
+10,Indoor
+11,Yellow Flower
+12,Animals
+13,Singular Plant in Pot
+14,Uniform Background

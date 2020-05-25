@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="style.css" rel="stylesheet">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+  <script src="script.js"></script>
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <title>Cluster Representation</title>
+</head>
+<body>
+    
+<table>
+    
+    <div id="General" style="display:row;">
+    
+    <tr>
+        <div id="country-info"></div>
+        <td style="padding-right:150px">
+        <div id="TablePart">
+            <p id="title">
+
+            </p>
+
+        <div id="info_clusters">
+          <div >
+            <table id="tablaClusters">
+              <tr>
+
+                <th>Number</th>        
+                <th>Name</th>        
+                <th>Color</th>
+
+              </tr>
+
+            </table>
+
+
+            <table id="tableClustersFile">
+              <tr>
+
+                <th>Number</th>        
+                <th>Color</th>
+
+              </tr>
+            </table>
+          </div>    
+        </div>
+        </div>
+        </td>
+
+        <td >
+            <div id="ControlPart">
+
+                <div id="controls">
+                    <span>
+                        <label><input id="combine" type="radio" name="grouping" value="combine" checked>Combine</label>
+                        <label><input id="solutions" type="radio" name="grouping" value="solutions">Solutions</label>
+                        <label><input id="file" type="radio" name="grouping" value="file">File</label>
+                    </span>
+                    <span>
+                        <label><input id="colors" type="radio" name="fill" value="colors" checked>Colors Solution</label>
+                        <label><input id="colorsfile" type="radio" name="fill" value="flags">Colors File</label>
+                    </span>
+                </div>
+
+                <div id="bubble-chart"></div>
+                
+            </div>
+        </td>
+    </tr>
+  
+
+</div>
+    
+</table>
+
+
+
+<script>
+    
+  d3.queue()
+    .defer(d3.csv, "files/combinedClusterFile.txt")
+    .defer(d3.csv, "files/titletopic.txt")
+    .defer(d3.csv, "files/filedclusterGT.txt")
+    .await(createBubbleChart);
+
+
+</script>
+
+</body>
+</html>
