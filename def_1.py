@@ -21,7 +21,7 @@ from tkinter import filedialog
 ###---GLOBAL VARIABLES---###
 root = Tk()
 
-URL_IMAGES = 'C:/Users/Pedro/Desktop/TFG/Imagenes_TFG/'
+URL_IMAGES = 'C:/Users/Pedro/Desktop/TFG/Code_Python/d3/Imagenes_TFG/'
 URL_D3_FILES = 'C:/Users/Pedro/Desktop/TFG/Code_Python/d3/files/'
 
 #variables for screen dimension
@@ -456,7 +456,6 @@ class Win1(Frame):
 
     def BuildClusterDefFile(self,filename_path,list_dgt):
 
-
         list_examination_cluster = self.ReadClusterFile(filename_path)
 
         size_list_solution = len(list_dgt)
@@ -464,7 +463,6 @@ class Win1(Frame):
         counter1 = 0
         
         def_list_cluster = []
-
 
         while(counter1 < size_list_solution):
 
@@ -529,7 +527,8 @@ class Win1(Frame):
     def RunHtml(self): 
 
         new = 2
-        url = 'http://localhost:8000/Desktop/TFG/Code_Python/d3/index.html'
+        # url = 'http://localhost:8000/Desktop/TFG/Code_Python/d3/index.html'
+        url = 'http://127.0.0.1:64688/index.html'
         webbrowser.open(url,new=new)
 
         return
