@@ -13,7 +13,11 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
   var F = 0.5;
 
-
+    
+  var img = document.createElement("img");
+  var photo_id = document.getElementById("photo_id");
+  var cluster_id = document.getElementById("cluster_id");
+    
   var ColorsSol = ['silver','rosybrown', 'lightcoral','navy', 'maroon', 'red', 'tomato','sienna','peru','darkorange',
                     'gold', 'olive', 'yellow','purple', 'yellowgreen', 'darkolivegreen','deeppink', 'lawngreen', 'lightgreen',
                     'mediumaquamarine', 'turquoise', 'paleturquoise', 'darkcyan','aqua','deepskyblue', 'steelblue', 
@@ -54,7 +58,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   addFillListener();
   addGroupingListeners();
   CreateListClusters();
-  // CreateListClustersFile();
   AddTitle(num_topic,name_topic);
 
 
@@ -83,10 +86,8 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
       return d3.select(elementID).property("checked");
   }
   
-  
 
   function createCircles_solution() {
-
 
       circles = svg.selectAll("circle")
         .data(combinedClusterFile)
@@ -94,24 +95,49 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
           .append("circle")
           .attr("r", 10)
           .on("mouseover", function(d) {
-            updateCountryInfo(d); //muesstra la info del ciculo: (ejemplo): nombre_país y población
+            updatePhotoInfo(d); //muesstra la info del ciculo: (ejemplo): nombre_país y población
           })
           .on("mouseout", function(d) {
-            updateCountryInfo();
+            updatePhotoInfo_();
           });
       updateCircles(); // para el color de los circulos
 
-      function updateCountryInfo(d) {
-          var info = "";
-          if (d) {
-              info = "PHOTO ID: " + d.ID_Photo + "; CLUSTER ID: " + d.ID_Cluster;
+      function updatePhotoInfo(d) {
+        
+        
+        if (d) {
+          
+          var url = "http://localhost:8000/Desktop/TFG/Imagenes_TFG/"+ name_topic+"/"+d.ID_Photo.toString()+".jpg";
+          
+          img.setAttribute("src",url);
+          img.setAttribute("alt","image");
+          img.setAttribute("width",200);
+          img.setAttribute("height",200);
+          document.getElementById("Photos").appendChild(img);
+          document.getElementById("Photos").appendChild(photo_id);
+          document.getElementById("Photos").appendChild(cluster_id);
+          photo_id.innerHTML = "ID Photo: "+d.ID_Photo.toString();
+          
+          if(!FileFill()){
+            cluster_id.innerHTML = "ID Cluster GT: "+d.ID_RCluster.toString();
+          }else{
+            
+            cluster_id.innerHTML = "ID Cluster File: "+d.ID_ECluster.toString();
           }
 
-          // d3.select("#country-info").html(info);
+          
+        }
+        
+      }
+
+      function updatePhotoInfo_(){
+        
+        document.getElementById("Photos").removeChild(img);
+        document.getElementById("Photos").removeChild(photo_id);
+        document.getElementById("Photos").removeChild(cluster_id);
+
       }
   }
-
-  
 
   //añade color a los círculos
   function updateCircles() {
@@ -316,35 +342,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
     
   }
 
-  function CreateListClustersFile(){
-
-    
-
-    for(i = 0; i < array_clusterse_cf.length; i++){
-
-      var tr_element = document.createElement("TR");
-      var td_element_number = document.createElement("TD");
-      var td_element_color = document.createElement("TD");
-      var td_number = document.createTextNode((i + 1).toString());
-      var td_color = document.createTextNode("   ");
-      
-      td_element_color.setAttribute("bgcolor",ColorsEx[i]);
-      
-      
-      td_element_number.appendChild(td_number);
-      td_element_color.appendChild(td_color);
-        
-      tr_element.appendChild(td_element_number);
-      tr_element.appendChild(td_element_color);
-        
-      
-      document.getElementById("tableClustersFile").appendChild(tr_element);
-
-      
-    }
-
-
-  }
 
   function AddTitle(num_topic,name_topic)
   {
