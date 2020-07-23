@@ -2,7 +2,6 @@ html, body {
     margin: 10px;
     padding: 0;
     font-family: sans-serif;
-
 }
 
 #controls {
@@ -45,38 +44,21 @@ circle {
 #general{
   display: flex;
   flex-direction:row;
-/*  justify-content: space-around;*/
 }
 
 #TablePart{
   
     display:flex;
     flex-direction: column;
-/*    align-content: flex-start;*/
 }
 
 #ControlPart{
-  
     display:flex;
     flex-direction: column;
-/*    align-content: flex-end*/
-
 }
-
-/* #bubble-chart{
- display:flex;
-  align-self: end;
-}
-
-#info_clusters{
-  display:flex;
- align-self: start;
-} */
 
 #tablaClusters {
-  
   border-collapse: collapse;
-/*  width: 100%;*/
 }
 #tablaClusters td, #tablaClusters th {
   border: 1px solid #ddd;

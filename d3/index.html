@@ -81,6 +81,7 @@
     .defer(d3.csv, "files/combinedClusterFile.txt")
     .defer(d3.csv, "files/titletopic.txt")
     .defer(d3.csv, "files/filedclusterGT.txt")
+    .defer(d3.csv, "files/urlimages.txt")
     .await(createBubbleChart);
 
 

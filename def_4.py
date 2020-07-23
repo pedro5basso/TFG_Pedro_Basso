@@ -4,36 +4,24 @@ import glob
 import matplotlib.pyplot as plt
 import webbrowser
 import io
-import shutil
 import xml.etree.ElementTree as ET
+import sys
+import socket,time
 
+from tkinter import *
+from tkinter.ttk import *
+from tkinter import ttk
 from PIL import ImageTk, Image
 from matplotlib import colors as mcolors
 from tkinter import filedialog
-from tkinter import ttk
-
-from tkinter import * 
-from tkinter.ttk import *
 import tkinter.font as font
+from _thread import *
 
 
 ###---GLOBAL VARIABLES---###
 root = tk.Tk()
 
-URL_IMAGES = 'C:/Users/Pedro/Desktop/TFG/Imagenes_TFG/'
-URL_D3_FILES = 'C:/Users/Pedro/Desktop/TFG/Code_Python/d3/files/'
-URL_GT = 'C:/Users/Pedro/Desktop/TFG/b/gt/'
-
-
-URL_GT_DEVSET_DGT = URL_GT + 'devset/dGT/'
-URL_GT_DEVSET_RGT = URL_GT + 'devset/rGT/'
-URL_GT_TESTSET_DGT = URL_GT + 'testset/dGT/'
-URL_GT_TESTSET_RGT = URL_GT + 'testset/rGT/'
-URL_XML = URL_GT + 'all_topics.xml'
-ALL_TOPICS_FILE = 'all_topics.txt'
-URL_TXT_FILE = URL_GT + ALL_TOPICS_FILE
-
-NUMBER_OF_TOPICS = 134
+NUMBER_OF_TOPICS = 135
 
 #variables for screen dimension
 width_window = 430
@@ -48,8 +36,7 @@ coordinate_y = (screen_height/2) - (height_window/2)
 
 
 # Styles
-
-# # Buttons
+# Buttons
 style_button = Style()
 style_button.configure('U.TButton', 
                             font =('arial', 10, 'bold'),
@@ -59,6 +46,12 @@ style_button.configure('U.TButton',
 style_button_c = Style()
 style_button_c.configure('C.TButton',
                             font =('arial', 10, 'bold'),
+                            foreground='darkred', 
+                            background='darkred')
+
+style_button_cb = Style()
+style_button_cb.configure('CB.TButton',
+                            font =('arial', 20, 'bold'),
                             foreground='darkred', 
                             background='darkred')
 
@@ -82,8 +75,59 @@ style_label_list.configure('UL.TLabel',
                     foreground='black', 
                     background='white')
 
-# self._frame2.configure(borderwidth=2, highlightbackground= 'black' ,relief='solid')
+style_label_similarity = Style()
+style_label_similarity.configure('S.TLabel',
+                                font =('arial', 9, 'italic'),
+                                foreground='black', 
+                                background='green',
+                                borderwidth=2, 
+                                highlightbackground= 'black',
+                                relief='solid')
 
+style_label_similarity.configure('NS.TLabel',
+                                font =('arial', 9, 'italic'),
+                                foreground='black', 
+                                background='red',
+                                borderwidth=2, 
+                                highlightbackground= 'black',
+                                relief='solid')
+
+style_label_similarity.configure('DKS.TLabel',
+                                font =('arial', 9, 'italic'),
+                                foreground='white', 
+                                background='black')
+
+style_lbl_cluster = Style()
+style_lbl_cluster.configure('Clust.TLabel',
+                            font =('arial', 9, 'italic'))
+
+style_lbl_id_Photo = Style()
+style_lbl_id_Photo.configure('IdPh.TLabel',
+                            font =('arial', 10, 'italic'),
+                            background='white')
+
+
+style_lbl_title = Style()
+style_lbl_title.configure('Tit.TLabel',
+                            font=('arial', 15, 'bold','underline'),
+                            foreground='black',
+                            background='white')
+
+style_lbl_metrics = Style()
+style_lbl_metrics.configure( 'MT.TLabel',
+                                font=('arial', 8, 'bold'),
+                                foreground='black',
+                                background='white',
+                                borderwidth=1, 
+                                highlightbackground= 'black',
+                                relief='solid')
+
+
+style_lbl_AP = Style()
+style_lbl_AP.configure('AP.TLabel',
+                        font=('arial', 10, 'bold'),
+                        foreground='black',
+                        background='white')
 
 
 
@@ -100,13 +144,15 @@ style_chbtt.configure('U.TCheckbutton',
                     font =('arial', 9, 'bold'),
                     foreground='black', 
                     background='white')
-# Class 1: Win1 
-class Win1(tk.Frame):
+
+
+
+# Class 1: Main 
+class Main(tk.Frame):
 
     _frame1 = tk.Frame()
     _frame2 = tk.Frame()
-    CheckVarEditable = tk.IntVar()
-    CheckVarClusters = tk.IntVar()
+    CheckVarClusters = IntVar()
 
     def __init__(self, parent):
         
@@ -115,20 +161,71 @@ class Win1(tk.Frame):
         self.grid()                 
         self._frame1 = tk.Frame(self.parent)
         self._frame2 = tk.Frame(self.parent)
+        self.configure(background='white')
+        self.AskDirectories()
         self.BuildAll_topics_txt_file()
         self.PutWidgets()           
 
         return
 
+    def AskDirectories(self):
+
+        try:
+            
+            file_url = 'directories.txt'
+
+            f = open(file_url,'x') 
+            f.close()
+
+            self.DADES16 =  filedialog.askdirectory()
+
+            self.URL_GT = self.DADES16 + '/gt/'
+            self.URL_IMAGES = self.DADES16 + '/images/collection/'
+            self.URL_XML = self.DADES16 + '/gt/all_topics.xml'
+            self.ALL_TOPICS_FILE = self.DADES16 + '/gt/all_topics.txt'
+            self.URL_TXT_FILE = self.ALL_TOPICS_FILE
+
+            src=open(file_url,"r")
+            fline1=self.DADES16 + "\n"
+            oline1=src.readlines()
+            oline1.insert(0,fline1)
+            src.close()
+            
+            src=open(file_url,"w")
+            src.writelines(oline1)
+            src.close()
+
+        except:
+
+            f_url = 'directories.txt'
+
+            list_direc = []
+
+            f = open(f_url,'r')
+
+            Dades16  = f.readline()
+            URL_D3_FILES =  '/d3/files'
+
+            Dades16_ = Dades16.replace('\n','')
+            self.DADES16 = Dades16_
+
+            self.URL_GT =  self.DADES16 + '/gt/'
+            self.URL_IMAGES =  self.DADES16 + 'images/collection/'
+            self.URL_XML = self.DADES16 + '/gt/all_topics.xml'
+            self.URL_TXT_FILE = self.DADES16 + '/gt/all_topics.txt'
+
+
+        return
+
     def BuildAll_topics_txt_file(self):
 
-        mydoc = ET.parse(URL_XML)
+        mydoc = ET.parse(self.URL_XML)
 
         root_ = mydoc.getroot()
 
         list_all_topics = []
 
-        for i in range(0, NUMBER_OF_TOPICS):
+        for i in range(0, NUMBER_OF_TOPICS - 1):
 
             topic_number = root_[i][0].text
             topic_name = root_[i][1].text
@@ -137,55 +234,76 @@ class Win1(tk.Frame):
             list_all_topics.append(pack_topics)
 
        
-        file_topics_url = URL_GT + ALL_TOPICS_FILE
+        # file_topics_url = self.URL_TXT_FILE
 
         try:
+
+            file_topics_url = self.ALL_TOPICS_FILE
 
             f = open(file_topics_url,'x')
             f.close()
 
+            count = 0
+
+            new_list_topics = []
+
+            while(count != NUMBER_OF_TOPICS):
+
+                if(count < 123):
+                    new_list_topics.append(list_all_topics[count])
+
+                if(count == 123):
+                    new_list_topics.append("124 NOT_EXIST\n")
+
+                if(count > 123):
+                    new_list_topics.append(list_all_topics[count -1])
+
+                count += 1
+
             with open(file_topics_url, 'w') as f:
-                for item in list_all_topics:
+                for item in new_list_topics:
                     f.write("%s" % item)
 
+            f.close()
+
         except:
-            print("Link Folder Read Correctly")
+            print("The folder already exists")
 
         return
 
     def PutWidgets(self):
         
-        self._frame1.grid(row=0,column=0)
+        self._frame1.grid(row=0,column=0)        
         self._frame1.configure(background='white')
 
         self._frame2.grid(row=0,column=1)
 
-        lbl1 = ttk.Label(self._frame1,text="      ", style='E.TLabel')
+        lbl1 = Label(self._frame1,text="      ", style='E.TLabel')
         lbl1.grid(row=0,column=0)
 
-        lbl2 = ttk.Label(self._frame1,text="      ", style='E.TLabel')
+        lbl2 = Label(self._frame1,text="      ", style='E.TLabel')
         lbl2.grid(row=1,column=0)
 
-        lbl3 = ttk.Label(self._frame1,text="      ", style='E.TLabel')
+        lbl3 = Label(self._frame1,text="      ", style='E.TLabel')
         lbl3.grid(row=2,column=0)
 
-        lbl4 = ttk.Label(self._frame1,text="      ", style='E.TLabel')
+        lbl4 = Label(self._frame1,text="      ", style='E.TLabel')
         lbl4.grid(row=3,column=0)
 
-        lbl5 = ttk.Label(self._frame1,text="      ", style='E.TLabel')
+        lbl5 = Label(self._frame1,text="      ", style='E.TLabel')
         lbl5.grid(row=3,column=1)
 
-        lbl6 = ttk.Label(self._frame1,text="      ", style='E.TLabel')
+        lbl6 = Label(self._frame1,text="      ", style='E.TLabel')
         lbl6.grid(row=5,column=2)
 
-        var = tk.IntVar()
-        R1 = Radiobutton(self._frame1, text="Check Results", style='U.TRadiobutton', variable=var, value=1, command= lambda: self.setFrame(var))
+        var = IntVar()
+        R1 = Radiobutton(self._frame1, text="Check Results",style='U.TRadiobutton', variable=var, value=1, command= lambda: self.setFrame(var))
         R1.grid(row=3,column=2,sticky='w')
 
-        R2 = Radiobutton(self._frame1, text="Check Evaluations",  style='U.TRadiobutton', variable=var, value=2, command= lambda: self.setFrame(var))
+        R2 = Radiobutton(self._frame1, text="Check Evaluations",style='U.TRadiobutton', variable=var, value=2, command= lambda: self.setFrame(var))
         R2.grid(row=4,column=2,sticky='w')
 
-        bttExit = Button(self._frame1, text="Exit", style='C.TButton' ,command= self.Exit)
+        bttExit = Button(self._frame1,text="Exit", style='C.TButton' , command= self.Exit)
         bttExit.grid(row = 6, column = 2,sticky='w')
  
         return
@@ -203,32 +321,28 @@ class Win1(tk.Frame):
     def MakeResultsPart(self):
         
         self._frame2.grid_forget()
-        self._frame2 = tk.Frame(self.parent, background='white')
+        self._frame2 = tk.Frame(self.parent, background = 'white')
         self._frame2.grid(row=0,column=1)
 
-        lbl1 = ttk.Label(self._frame2,text="      ", style='E.TLabel')
+        lbl1 = Label(self._frame2,text="      ", style='E.TLabel')
         lbl1.grid(row=0,column=0)
 
-        lbl2 = ttk.Label(self._frame2,text="      ", style='E.TLabel')
+        lbl2 = Label(self._frame2,text="      ", style='E.TLabel')
         lbl2.grid(row=1,column=0)
 
-        goButton = Button(self._frame2, text = "Choose Folder ", style='U.TButton',command = self.ResultsWindow)
+        goButton = Button(self._frame2, text = "Choose Folder " , style='U.TButton',command = self.ResultsWindow)
         goButton.grid(row = 5, column = 3)
 
-        TopicListButton = Button(self._frame2,text="Topic List", style='U.TButton', command=self.TopicList)
+        TopicListButton = Button(self._frame2,text="Topic List" , style='U.TButton',  command=self.TopicList)
         TopicListButton.grid(row=5, column=4)
- 
-        NamesCheckButton = Checkbutton(self._frame2,text="Editable Names", style='U.TCheckbutton', variable=self.CheckVarEditable, onvalue=1, offvalue=0)
-        NamesCheckButton.grid(row=6,column=3,sticky='w')
 
         ClusterCheckButton = Checkbutton(self._frame2,text="Order by Cluster", style='U.TCheckbutton', variable=self.CheckVarClusters, onvalue=1, offvalue=0)
-        ClusterCheckButton.grid(row=7,column=3,sticky='w')
+        ClusterCheckButton.grid(row=6,column=3,sticky='w')
 
         return
 
     def ResultsWindow(self):
 
-        editable_names = self.CheckVarEditable.get()
         order_clusters = self.CheckVarClusters.get()
         root.filename =  filedialog.askdirectory()
         
@@ -237,19 +351,20 @@ class Win1(tk.Frame):
 
         if(folder_name != ''):
 
-            file_all_topics = open(URL_TXT_FILE,"r")
+            file_all_topics = open(self.ALL_TOPICS_FILE,"r")
 
             for i in range(0, NUMBER_OF_TOPICS):
 
                 line = file_all_topics.readline()            
                 list_line = line.split()
 
-                if(list_line[1] == folder_name):
+                if(list_line[1] == folder_name or folder_name == 'topic'+list_line[0]):
                     num_topic = list_line[0]
             
-            self.new = tk.Toplevel(self.master)
+            self.new = Toplevel(self.master)
             self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
-            Win2(self.new, num_topic ,editable_names,root.filename,order_clusters)
+            SolWindow(self.new, num_topic,root.filename,order_clusters,self.DADES16)
+            
         else:
             print('Choose a folder!')
 
@@ -257,32 +372,34 @@ class Win1(tk.Frame):
 
     def TopicList(self):
 
-        self.new = tk.Toplevel(self.master)        
+        self.new = Toplevel(self.master)        
         self.new.geometry("320x300")
         self.new.title("Topic List")
         self.new.grid()
         
-        frame_canvas = tk.Frame(self.new, background='white')
+        frame_canvas = tk.Frame(self.new)
+        frame_canvas.configure(background='white')
         frame_canvas.grid(row=0,column=0,columnspan=3)
 
         canvas = Canvas(frame_canvas, width=300, height=300, background='white')
         canvas.grid(row=0,column=0)
 
-        scrollbar = ttk.Scrollbar(frame_canvas,orient="vertical",command=canvas.yview)       
+        scrollbar = Scrollbar(frame_canvas,orient="vertical",command=canvas.yview)       
         scrollbar.grid(row=0, column=1, sticky='ns')
 
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        frame_labels = tk.Frame(canvas, background='white')
+        frame_labels = tk.Frame(canvas)
+        frame_labels.configure(background='white')
         canvas.create_window(0,0,window=frame_labels, anchor='nw')
 
-        file_topics_numbers = open(URL_TXT_FILE,"r")
+        file_topics_numbers = open(self.URL_TXT_FILE,"r")
 
         for i in range(0, NUMBER_OF_TOPICS):
 
             line = file_topics_numbers.readline()            
             list_line = line.split()
-            lbl = ttk.Label(frame_labels, text="Topic "+list_line[0] + ": "+ list_line[1], style='UL.TLabel')
+            lbl = Label(frame_labels, text="-Topic "+list_line[0] + ": "+ list_line[1], style='UL.TLabel')
             lbl.grid(row=i, column=0, sticky='w')
 
         frame_labels.update_idletasks()
@@ -298,29 +415,29 @@ class Win1(tk.Frame):
         self._frame2 = tk.Frame(self.parent, background='white')
         self._frame2.grid(row=0,column=1)
 
-        lbl1 = ttk.Label(self._frame2,text="      ", style='E.TLabel')
+        lbl1 = Label(self._frame2,text="      ", style='E.TLabel')
         lbl1.grid(row=0,column=0)
 
-        lbl2 = ttk.Label(self._frame2,text="      ", style='E.TLabel')
+        lbl2 = Label(self._frame2,text="      ", style='E.TLabel')
         lbl2.grid(row=1,column=0)
 
-        lbl3 = ttk.Label(self._frame2,text="      ", style='E.TLabel')
+        lbl3 = Label(self._frame2,text="      ", style='E.TLabel')
         lbl3.grid(row=0,column=1)
 
-        lbl3 = ttk.Label(self._frame2,text="      ", style='E.TLabel')
+        lbl3 = Label(self._frame2,text="      ", style='E.TLabel')
         lbl3.grid(row=3,column=1)
         
 
         lbl_title_results = Label(self._frame2, text="Results File", style='U.TLabel')
         lbl_title_results.grid(row=1,column=1)
         
-        btt_selesct_file = Button(self._frame2, text="Select the Results file", style='U.TButton', command = self.CheckResultwindow)
+        btt_selesct_file = Button(self._frame2, text="Select the Results file", style='U.TButton' , command = self.CheckResultwindow)
         btt_selesct_file.grid(row=2,column=1)
 
-        lbl_title_clusters = Label(self._frame2, text="Clusters File", style='U.TLabel')
+        lbl_title_clusters = Label(self._frame2, text="Clusters File" , style='U.TLabel')
         lbl_title_clusters.grid(row=4,column=1)
         
-        btt_clusters = Button(self._frame2, text="Select the Clusters file", style='U.TButton', command=self.CheckClustersWindow)
+        btt_clusters = Button(self._frame2, text="Select the Clusters file", style='U.TButton' , command=self.CheckClustersWindow)
         btt_clusters.grid(row=5, column=1)
 
         return
@@ -337,7 +454,7 @@ class Win1(tk.Frame):
             self.new = Toplevel(self.master)
             self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
             self.new.grid()
-            Win5(self.new,file_txt_name,root.filename)
+            MetricWindow(self.new,file_txt_name,root.filename,self.DADES16)
         else:
             print('Choose a folder!')
 
@@ -350,11 +467,26 @@ class Win1(tk.Frame):
         url_list = root.filename.split('/')
         file_txt_name = url_list[-1]
 
-        self.MakeSpecificFiles(file_txt_name,root.filename)
+        ClusterRepresentation(file_txt_name,root.filename,self.DADES16)
 
         return
 
-    def MakeSpecificFiles(self,file_txt_name,filename_path):
+    def Exit(self):
+        exit()
+        return   
+  
+##-- End of Class 1: Main --##
+
+# ------------------------------------------
+
+# Class 2: ClusterRepresentation
+
+class ClusterRepresentation():
+
+
+    def __init__(self,file_txt_name,filename_path,DADES16):
+
+        self.MakeURLS(DADES16)
 
         name_topic,num_topic = self.Extract_Name_Number_Topic(file_txt_name)
         
@@ -366,7 +498,20 @@ class Win1(tk.Frame):
 
         self.MakeSecificSelectedFile(filename_path,list_dgt)
 
+        self.MakeSpecificURLHTTPFile()
+
         self.RunHtml()
+
+        return
+
+    def MakeURLS(self,DADES16):
+
+        self.URL_IMAGES =  DADES16 + '/images/collection/'
+        self.URL_D3_FILES =  'd3/files/'
+        self.URL_GT =  DADES16 + '/gt'
+
+        self.URL_GT_DEVSET_DGT = self.URL_GT + '/devset/dGT/'
+        self.URL_GT_TESTSET_DGT = self.URL_GT + '/testset/dGT/'
 
         return
 
@@ -380,7 +525,7 @@ class Win1(tk.Frame):
 
     def MakeSpecificTitletopic(self,name_topic,num_topic):
 
-        FILE_TO_MODIFY = URL_D3_FILES +'titletopic.txt'
+        FILE_TO_MODIFY = self.URL_D3_FILES +'titletopic.txt'
 
         list_file = str(num_topic)+','+name_topic
 
@@ -403,9 +548,9 @@ class Win1(tk.Frame):
     def ReadDGTFile(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70):
-            filename = URL_GT_DEVSET_DGT + name_topic + " dGt.txt"
+            filename = self.URL_GT_DEVSET_DGT + name_topic + " dGt.txt"
         else:
-            filename = URL_GT_TESTSET_DGT + name_topic + " dGt.txt"
+            filename = self.URL_GT_TESTSET_DGT + name_topic + " dGt.txt"
 
         try:
             count = 0 
@@ -443,7 +588,7 @@ class Win1(tk.Frame):
 
     def MakeSpecificdClusterFile(self,name_topic,num_topic):
 
-        FILE_TO_MODIFY = URL_D3_FILES + 'filedclusterGT.txt'
+        FILE_TO_MODIFY = self.URL_D3_FILES + 'filedclusterGT.txt'
 
         list_file = self.ReadDclusterGT(num_topic,name_topic)
 
@@ -466,9 +611,9 @@ class Win1(tk.Frame):
     def ReadDclusterGT(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70):
-            filename = URL_GT_DEVSET_DGT + name_topic + " dclusterGt.txt"
+            filename = self.URL_GT_DEVSET_DGT + name_topic + " dclusterGt.txt"
         else:
-            filename = URL_GT_TESTSET_DGT + name_topic + " dclusterGt.txt"
+            filename = self.URL_GT_TESTSET_DGT + name_topic + " dclusterGt.txt"
         
         try:
             count = 0 
@@ -507,7 +652,7 @@ class Win1(tk.Frame):
 
         list_clusters = self.BuildClusterDefFile(filename_path,list_dgt)
 
-        FILE_TO_MODIFY = URL_D3_FILES + 'combinedClusterFile.txt'
+        FILE_TO_MODIFY = self.URL_D3_FILES + 'combinedClusterFile.txt'
 
         with open(FILE_TO_MODIFY, 'w') as f:
             for item in list_clusters:
@@ -595,32 +740,84 @@ class Win1(tk.Frame):
 
         return(list_clus_belong_photos)
 
-    def RunHtml(self): 
+    def MakeSpecificURLHTTPFile(self):
 
-        new = 2
-        url = 'http://localhost:8000/Desktop/TFG/Code_Python/d3/index.html'
-        webbrowser.open(url,new=new)
+        url_images = self.URL_IMAGES
 
+        g = url_images.split('/')
+        q = len(g)
+        g.pop(-1)
+        g.pop(-1)
+        g[0] = 'http:'
+        g[1] = ''
+        g[2] = 'localhost:8000'
+
+        b = self.listToString(g)
+
+        FILE_TO_MODIFY = self.URL_D3_FILES +'urlimages.txt'
+        
+        try:
+
+            f = open(FILE_TO_MODIFY,'x')
+            f.close()
+
+            src=open(FILE_TO_MODIFY,"r")
+            fline=b
+            oline=src.readlines()
+            oline.insert(0,fline)
+            src.close()
+            
+            src=open(FILE_TO_MODIFY,"w")
+            src.writelines(oline)
+            src.close()
+
+            src=open(FILE_TO_MODIFY,"r")
+            fline="URL\n"
+            oline=src.readlines()
+            oline.insert(0,fline)
+            src.close()
+            
+            src=open(FILE_TO_MODIFY,"w")
+            src.writelines(oline)
+            src.close()
+
+        except:
+            print(" ")
+            
+        
         return
 
-    def Exit(self):
-        exit()
-        return   
+    def RunHtml(self): 
+
+        url_ = 'http://localhost:8000//index.html'
+        webbrowser.open(url_,new=2)
+
+        return
+   
+    def listToString(self,s):
+         
+        str1 = ""
   
-##-- End of Class 1: Win1 --##
+        for ele in s:  
+            str1 += ele + '/'
+          
+        return str1
+
+##-- End of Class 3: ClusterRepresentation --##
 
 # ------------------------------------------
 
-# Class 2: Win2 
-class Win2():
+# Class 3: SolWindow 
+class SolWindow():
 
-    def __init__(self, master, num_topic,editable_names,folder_topic,order_clusters):
+    def __init__(self, master, num_topic,folder_topic,order_clusters, DADES16):
 
         self.master = master
         self.frame = tk.Frame(self.master)
+        self.frame.configure(background='white')
         self.frame.grid()
-        self.frame.grid_rowconfigure(0, weight=1)
-        self.frame.columnconfigure(0, weight=1)
+        
+        self.MakeURLS(DADES16)
 
         Color_List = ['silver','rosybrown', 'lightcoral','navy', 'maroon', 'red', 'tomato','sienna','peru','darkorange',
                         'gold', 'olive', 'yellow','purple', 'yellowgreen', 'darkolivegreen','deeppink', 'lawngreen', 'lightgreen',
@@ -629,34 +826,47 @@ class Win2():
 
         name_topic = self.FrameUP(num_topic,Color_List)
 
-        list_similarity = self.ReadRGTFile(num_topic,name_topic)
+        list_similarity,list_images_rgt = self.ReadRGTFile(num_topic,name_topic)
         
-        list_clus_belong_photos = self.ReadDGTFile(num_topic,name_topic)
+        list_clus_belong_photos,list_images_dgt = self.ReadDGTFile(num_topic,name_topic)
 
         if(order_clusters == 0):
             aux = 0
-            list_images_url = self.Reading_folder_images(num_topic,folder_topic)
+            list_images_url = self.Reading_folder_images(num_topic,folder_topic,list_images_rgt)
             list_images_resized =  self.ResizePhotos(list_images_url,aux)
 
         if(order_clusters == 1):
             aux = 1
-            list_images_url = self.MakeURLDGT(list_clus_belong_photos,name_topic)
+            list_images_url = self.Reading_folder_images(num_topic,folder_topic,list_images_dgt)
             list_images_resized =  self.ResizePhotos(list_images_url,aux)        
 
-        self.FramesDown(list_images_url,num_topic,name_topic,Color_List,editable_names,list_images_resized,order_clusters,list_similarity,list_clus_belong_photos)
+        self.FramesDown(list_images_url,num_topic,name_topic,Color_List,list_images_resized,order_clusters,list_similarity,list_clus_belong_photos)
         
+        return
+
+    def MakeURLS(self,DADES16):
+
+        self.URL_IMAGES =  DADES16 + '/images/collection'
+        self.URL_GT =  DADES16 + '/gt'
+
+        self.URL_GT_DEVSET_DGT = self.URL_GT + '/devset/dGT/'
+        self.URL_GT_DEVSET_RGT = self.URL_GT + '/devset/rGT/'
+        self.URL_GT_TESTSET_DGT = self.URL_GT + '/testset/dGT/'
+        self.URL_GT_TESTSET_RGT = self.URL_GT + '/testset/rGT/'
+        self.URL_TXT_FILE = self.URL_GT + '/all_topics.txt'
+
         return
 
     def FrameUP(self,num_topic,Color_List):
         
         name_topic = self.Read_topics_file(num_topic)
-        Label_Topic = Label(self.frame, text = "TOPIC "+ num_topic +": "+ name_topic)
+        Label_Topic = Label(self.frame, text = "TOPIC "+ num_topic +": "+ name_topic, style='Tit.TLabel')
 
-        Button_Legend = Button(self.frame, text="Legend",command= lambda: self.LegendFrame(num_topic,name_topic,Color_List))
+        Button_Legend = Button(self.frame, text="Legend", style='U.TButton', command= lambda: self.LegendFrame(num_topic,name_topic,Color_List))
 
-        label_empty_1 = Label(self.frame, text="   ")
-        label_empty_2 = Label(self.frame, text="   ")
-        label_empty_3 = Label(self.frame, text="   ")
+        label_empty_1 = Label(self.frame, text="   ", style='E.TLabel')
+        label_empty_2 = Label(self.frame, text="   ", style='E.TLabel')
+        label_empty_3 = Label(self.frame, text="   ", style='E.TLabel')
 
         Label_Topic.grid(row=0, column= 2)
         Button_Legend.grid(row=0, column = 4)
@@ -668,7 +878,7 @@ class Win2():
 
     def Read_topics_file(self, num_topic):
 
-        filename = URL_TXT_FILE 
+        filename = self.URL_TXT_FILE 
 
         count = 0 
         with open(filename, 'r') as f:
@@ -694,15 +904,15 @@ class Win2():
     def LegendFrame(self, num_topic,name_topic,Color_List):
 
         self.new = Toplevel(self.frame)        
-        self.new.geometry("640x640")
+        self.new.geometry("320x300")
         self.new.title("Legend Window")
         
         list_cluster_in_topic = self.ReadDclusterGT(num_topic,name_topic)
 
-        frame_canvas = Frame(self.new)
+        frame_canvas = tk.Frame(self.new)
         frame_canvas.grid(row=0,column=0,columnspan=3)
 
-        canvas = Canvas(frame_canvas, width=480, height=640)
+        canvas = Canvas(frame_canvas, width=300, height=300)
         canvas.grid(row=0,column=0)
 
         scrollbar = Scrollbar(frame_canvas,orient="vertical",command=canvas.yview)       
@@ -710,15 +920,16 @@ class Win2():
 
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        frame_labels = Frame(canvas)
+        frame_labels = tk.Frame(canvas)
+        frame_labels.configure(background='white')
         canvas.create_window(0,0,window=frame_labels, anchor='nw')
 
         tam = len(list_cluster_in_topic)
 
         for i in range(0,tam):
             
-            lbl = Label(frame_labels, text="Cluster "+str(i + 1) + ": "+ list_cluster_in_topic[i])
-            lbl.grid(row=i, column=0, sticky='se')
+            lbl = Label(frame_labels, text="Cluster "+str(i + 1) + ": "+ list_cluster_in_topic[i], style='UL.TLabel')
+            lbl.grid(row=i, column=0, sticky='e')
             canvas_color = Canvas(frame_labels, height=30, bg=Color_List[i])
             canvas_color.grid(row=i,column=1)
 
@@ -731,9 +942,9 @@ class Win2():
     def ReadDclusterGT(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70):
-            filename = URL_GT_DEVSET_DGT + name_topic + " dclusterGt.txt"
+            filename = self.URL_GT_DEVSET_DGT + name_topic + " dclusterGt.txt"
         else:
-            filename = URL_GT_TESTSET_DGT + name_topic + " dclusterGt.txt"
+            filename = self.URL_GT_TESTSET_DGT + name_topic + " dclusterGt.txt"
         
         try:
             count = 0 
@@ -767,9 +978,9 @@ class Win2():
     def ReadRGTFile(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70):
-            filename = URL_GT_DEVSET_RGT + name_topic + " rGt.txt"
+            filename = self.URL_GT_DEVSET_RGT + name_topic + " rGt.txt"
         else:
-            filename = URL_GT_TESTSET_RGT + name_topic + " rGt.txt"
+            filename = self.URL_GT_TESTSET_RGT + name_topic + " rGt.txt"
 
         try:
             count = 0 
@@ -788,6 +999,7 @@ class Win2():
             rGT_file = io.open(filename, 'r')
 
         list_similarity = []
+        list_images = []
 
         for i in range(0, int(count)):
 
@@ -796,18 +1008,19 @@ class Win2():
             photo_id = list_line[0]
             sim = list_line[-1]
             _pack = [photo_id,sim]
+            list_images.append(photo_id)
             list_similarity.append(_pack)
 
         rGT_file.close()
 
-        return (list_similarity)
+        return (list_similarity,list_images)
 
     def ReadDGTFile(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70):
-            filename = URL_GT_DEVSET_DGT + name_topic + " dGt.txt"
+            filename = self.URL_GT_DEVSET_DGT + name_topic + " dGt.txt"
         else:
-            filename = URL_GT_TESTSET_DGT + name_topic + " dGt.txt"
+            filename = self.URL_GT_TESTSET_DGT + name_topic + " dGt.txt"
 
         try:
             count = 0 
@@ -826,6 +1039,7 @@ class Win2():
             dGT_file = io.open(filename, 'r')
 
         list_clus_belong_photos = []
+        list_images = []
 
         for i in range(0, int(count)):
             
@@ -833,36 +1047,25 @@ class Win2():
             list_line = line.split(',')
             photo_id = list_line[0]
             cluster_number = list_line[1]
-            def_list = [photo_id, cluster_number]    
+            def_list = [photo_id, cluster_number]
+            list_images.append(photo_id)   
             list_clus_belong_photos.append(def_list)
         
         dGT_file.close()
 
-        return (list_clus_belong_photos)
+        return (list_clus_belong_photos,list_images)
 
-    def Reading_folder_images(self,num_topic,folder_topic):
+    def Reading_folder_images(self,num_topic,folder_topic,list_images):
 
-        self.a = "a\ "
-        self.b = self.a[1]
-        self.image_list = []
-        self.image_url = []
+        list_images_url = []
+        size_list = len(list_images)
 
-        for filename in glob.glob(folder_topic+"/*.jpg"):
-            im=Image.open(filename)
-            self.A = list(filename)
-            
-            i = 0
-            
-            for c in filename:
-                if (c == self.b):
-                    self.A[i] = '/'
-                
-                i = i +1
-            self.image_url_def = self.listToString(self.A)
-            self.image_url.append(self.image_url_def)
-            self.image_list.append(ImageTk.PhotoImage(Image.open(self.image_url_def)))
+        for i in range(0, int(size_list)):
 
-        return (self.image_url)
+            image_path = folder_topic + '/' + list_images[i] + ".jpg"
+            list_images_url.append(image_path)      
+
+        return (list_images_url)
 
     def listToString(self,s):
          
@@ -911,28 +1114,12 @@ class Win2():
 
         return list_photo_type
 
-    def MakeURLDGT(self,list_clus_belong_photos,name_topic):
-
-        size_list = len(list_clus_belong_photos)
-        
-        list_dgt_url_images = []
-
-        for i in range(0,size_list):
-
-            _pack = list_clus_belong_photos[i]
-            id_photo_dgt = _pack[0]
-            image_path = URL_IMAGES + name_topic + "/" + id_photo_dgt + ".jpg"
-
-            list_dgt_url_images.append(image_path)
-
-        return(list_dgt_url_images)
-
-    def FramesDown(self,images_vector,num_topic, name_topic,Color_List,editable_names,images_vector_jpg,order_clusters,list_similarity,list_clus_belong_photos):
+    def FramesDown(self,images_vector,num_topic, name_topic,Color_List,images_vector_jpg,order_clusters,list_similarity,list_clus_belong_photos):
         
         frame_canvas = Frame(self.frame)
         frame_canvas.grid(row=1, column=0, columnspan=5, sticky='nw')
        
-        GENERAL_CANVAS = Canvas(frame_canvas,width=1510, height=750, bg='white')
+        GENERAL_CANVAS = Canvas(frame_canvas,width=1510, height=730, bg='white')
         GENERAL_CANVAS.grid(row=0, column=0)
 
         scrollbar = Scrollbar(frame_canvas,orient="vertical",command=GENERAL_CANVAS.yview)       
@@ -941,6 +1128,7 @@ class Win2():
         GENERAL_CANVAS.configure(yscrollcommand=scrollbar.set)
 
         frame_fotos = tk.Frame(GENERAL_CANVAS)
+        frame_fotos.configure(background='white')
         GENERAL_CANVAS.create_window((0,0), window=frame_fotos, anchor='nw')
         
         _num_fotos = 0
@@ -964,7 +1152,7 @@ class Win2():
             columns = 6
 
         images_vector_url = images_vector
-        frames_grid = [[tk.Frame() for j in range(columns)] for i in range(rows)]
+        frames_grid = [[Frame() for j in range(columns)] for i in range(rows)]
         canvas_grid = [[Canvas() for j in range(columns)] for i in range(rows)]
 
         for i in range (1, rows):
@@ -974,15 +1162,14 @@ class Win2():
             for j in range (1, columns):
 
                 frames_grid[i][j] = tk.Frame(frame_fotos)
-
-                frames_grid[i][j].config(width=300,height=300,style='B.TFrame')
+                frames_grid[i][j].config(width=300,height=300, background='white')
                 frames_grid[i][j].grid(row=i, column=j, sticky='n')
 
                 if(_num_fotos <= fotos_num):
 
                     url_image = self.ExtractPhoto_fromUrl(images_vector_url[_num_fotos - 1])
 
-                    canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300)
+                    canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300, bg='white')
                     canvas_grid[i][j].grid(row=0, column=0, columnspan=3)
 
                     self.pack = self.images_vector_jpg[_num_fotos-1]
@@ -1002,22 +1189,16 @@ class Win2():
                         
                         canvas_grid[i][j].create_image(0,0, image=self.image, anchor='nw')
 
-                    _lbl_number = tk.Label(frames_grid[i][j], text="IMAGE "+str(_num_fotos))    
-                    _lbl_number.grid(row=1, column=0, sticky='s')
+                    _lbl_number = Label(frames_grid[i][j], text="IMAGE "+str(_num_fotos))  
+                    _lbl_number.grid(row=1, column=0, sticky=W)
 
-                    if(editable_names == 1):
+                    _photo_name = Label(frames_grid[i][j], text=url_image)
+                    _photo_name.configure(style='IdPh.TLabel') 
+                    _photo_name.grid(row=1, column=1, sticky=W)
 
-                        _photo_name = tk.Text(frames_grid[i][j], width=15, height=5)
-                        _photo_name.grid(row=1, column=1, sticky='w')
-                        _photo_name.insert(tk.END,url_image)
-
-                    else:
-
-                        _photo_name = Label(frames_grid[i][j], text=url_image)
-                        _photo_name.grid(row=1, column=1, sticky='w')
-
-                    _lbl_cluster = tk.Label(frames_grid[i][j])
-                    _lbl_cluster.grid(row=1, column=2, sticky='w')
+                    _lbl_cluster = Label(frames_grid[i][j])
+                    _lbl_cluster.configure(style='Clust.TLabel')
+                    _lbl_cluster.grid(row=1, column=2 ,sticky=W)
 
                     if(order_clusters == 0):
                         sim = self.SearchSimilarity(url_image,list_similarity)
@@ -1032,10 +1213,9 @@ class Win2():
 
                         canvas_grid[i][j].config(bg='white')            
                             
-                        bckgrnd_lbl = 'red'
-                        _lbl_number.config(bg=bckgrnd_lbl)
+                        _lbl_number.configure(style='NS.TLabel')
 
-                        _lbl_cluster.config(text="No Cluster", bg='black', fg='white')
+                        _lbl_cluster.configure(text="No Cluster", background='black', foreground='white')
 
                     elif(sim == 1):
                         
@@ -1046,23 +1226,24 @@ class Win2():
                         canvas_grid[i][j].config(bg=color_bckgrn)
 
                         bckgrnd_lbl = 'green'
-                        _lbl_number.config(bg=bckgrnd_lbl)
+                        _lbl_number.configure(style='S.TLabel')
 
-                        _lbl_cluster.config( text="Cluster "+str(number_cluster), bg=color_bckgrn)
+                        _lbl_cluster.configure( text='Cluster '+str(number_cluster), background=color_bckgrn)
 
                     else:
+
                         canvas_grid[i][j].config(bg='black')
+                       
+                        _lbl_number.configure(style='DKS.TLabel')
 
-                        bckgrnd_lbl = 'white'
-                        _lbl_number.config(bg=bckgrnd_lbl)
-
-                        _lbl_cluster.config( text="No SIM", bg='white')
+                        _lbl_cluster.configure(text="No SIM", background='white')
 
                 else:
+
                     canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300, bg='black')                
                     canvas_grid[i][j].grid(row=0, column=0)
-                    _lbl_number = tk.Label(frames_grid[i][j], text="IMAGE "+str(_num_fotos))
-                    _lbl_number.grid(row=1, column=0, sticky='s')
+                    _lbl_number = Label(frames_grid[i][j], text="IMAGE "+str(_num_fotos))
+                    _lbl_number.grid(row=1, column=0, sticky=W)
                     
                 _num_fotos += 1
 
@@ -1074,14 +1255,14 @@ class Win2():
           
         GENERAL_CANVAS.config(scrollregion=GENERAL_CANVAS.bbox("all"))
         
-        btt_grapics_clusters = Button(self.frame, text="Pie Chart Clusters", command = lambda: self.PieChartGraphicCluster(name_topic,num_topic,list_clus_belong_photos,Color_List))
+        btt_grapics_clusters = Button(self.frame, text="Pie Chart Clusters", style='U.TButton', command = lambda: self.PieChartGraphicCluster(name_topic,num_topic,list_clus_belong_photos,Color_List))
         btt_grapics_clusters.grid(row=2,column=2)
 
         if(order_clusters == 0):
-            btt_graphics_similarity = Button(self.frame, text="Pie Chart Similarity", command = lambda: self.PieChartGraphicSimilarity(number_of_1,number_of_0))
+            btt_graphics_similarity = Button(self.frame, text="Pie Chart Similarity", style='U.TButton', command = lambda: self.PieChartGraphicSimilarity(number_of_1,number_of_0))
             btt_graphics_similarity.grid(row=2,column=1)
         
-        btt_close = Button(self.frame, text="Close", command = lambda: self.CloseWindow(images_vector_jpg,self.images_vector_jpg))
+        btt_close = Button(self.frame, text="Close", style='CB.TButton', command = lambda: self.CloseWindow(images_vector_jpg,self.images_vector_jpg))
         btt_close.grid(row=2,column=3)
 
         return
@@ -1104,11 +1285,12 @@ class Win2():
         counter = 0
 
         while((counter < list_length) and (not search)):
-
+        
             _pack = list_similarity[counter]
             _photo_id = _pack[0]
 
             if(url_image == _photo_id):
+
                 search = True
                 if(int(_pack[1]) == 1):
                     sim = 1
@@ -1207,22 +1389,39 @@ class Win2():
 
         return
 
-##-- End of Class 2: Win2 --##
+##-- End of Class 3: SolWindow --##
 
 # ------------------------------------------
 
-# Class 5: Win5
-class Win5():
+# Class 4: MetricWindow
+class MetricWindow():
 
-    def __init__(self, master,filename,path_filename):
+    def __init__(self, master,filename,path_filename,DADES16):
 
         self.master = master
         self.frame = tk.Frame(self.master)
+        self.frame.configure(background='white')
+
+        self.MakeURLS(DADES16)
 
         result_list = self.ReadEvalFile(path_filename)
 
         num_topic,name_topic = self.Top_Frame(filename)
         self.Bottom_Frame(result_list,num_topic,name_topic)
+
+        return
+
+    def MakeURLS(self,DADES16):
+
+        self.URL_GT = DADES16 + '/gt'
+        self.URL_IMAGES = DADES16 + '/images/collection/'
+
+        self.URL_GT_DEVSET_DGT = self.URL_GT + '/devset/dGT/'
+        self.URL_GT_DEVSET_RGT = self.URL_GT + '/devset/rGT/'
+        self.URL_GT_TESTSET_DGT = self.URL_GT + '/testset/dGT/'
+        self.URL_GT_TESTSET_RGT = self.URL_GT + '/testset/rGT/'
+
+        self.URL_TXT_FILE = DADES16 + '/gt/all_topics.txt'
 
         return
 
@@ -1256,11 +1455,12 @@ class Win5():
         num_topic = self.Extract_Number_of_filename(filename)
 
         name_topic = self.NameTopic(num_topic)
+        self.master.configure(background='white')
 
-        lbl_filename = Label(self.master, text="FILE SELECTED: " + filename)
+        lbl_filename = Label(self.master, text="FILE SELECTED: " + filename, style='Tit.TLabel')
         lbl_filename.grid(row=0,column=1)
 
-        lbl_topic_info = Label(self.master, text="Topic "+num_topic + ": "+ name_topic )
+        lbl_topic_info = Label(self.master, text="Topic "+num_topic + ": "+ name_topic,  style='Tit.TLabel' )
         lbl_topic_info.grid(row=0,column=3)
         
         return(num_topic,name_topic)
@@ -1294,7 +1494,7 @@ class Win5():
 
     def NameTopic(self, num_topic):
 
-        file_topics_numbers = open(URL_TXT_FILE ,"r")
+        file_topics_numbers = open(self.URL_TXT_FILE ,"r")
 
         list_topic = []
 
@@ -1335,9 +1535,9 @@ class Win5():
     def ReadRGTFile(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70):
-            filename = URL_GT_DEVSET_RGT + name_topic + " rGt.txt"
+            filename = self.URL_GT_DEVSET_RGT + name_topic + " rGt.txt"
         else:
-            filename = URL_GT_TESTSET_RGT + name_topic + " rGt.txt"
+            filename = self.URL_GT_TESTSET_RGT + name_topic + " rGt.txt"
 
         try:
             count = 0 
@@ -1373,9 +1573,9 @@ class Win5():
     def ReadDGTFile(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70):
-            filename = URL_GT_DEVSET_DGT + name_topic + " dGt.txt"
+            filename = self._DEVSET_DGT + name_topic + " dGt.txt"
         else:
-            filename = URL_GT_TESTSET_DGT + name_topic + " dGt.txt"
+            filename = self.URL_GT_TESTSET_DGT + name_topic + " dGt.txt"
 
         try:
             count = 0 
@@ -1419,7 +1619,7 @@ class Win5():
 
             _pack = result_list[i]
             id_photo_result = _pack[1]
-            image_path = URL_IMAGES + name_topic + "/" + id_photo_result + ".jpg"
+            image_path = self.URL_IMAGES + name_topic + "/" + id_photo_result + ".jpg"
 
             list_images_50.append(image_path)
 
@@ -1510,9 +1710,9 @@ class Win5():
     def ReadDclusterGT(self,num_topic,name_topic):
 
         if(int(num_topic) <= 70):
-            filename = URL_GT_DEVSET_DGT + name_topic + " dclusterGt.txt"
+            filename = self.URL_GT_DEVSET_DGT + name_topic + " dclusterGt.txt"
         else:
-            filename = URL_GT_TESTSET_DGT + name_topic + " dclusterGt.txt"
+            filename = self.URL_GT_TESTSET_DGT + name_topic + " dclusterGt.txt"
         
         try:
             count = 0 
@@ -1611,7 +1811,7 @@ class Win5():
         frame_canvas = Frame(self.master)
         frame_canvas.grid(row=1, column=0, columnspan=5, sticky='nw')
        
-        GENERAL_CANVAS = Canvas(frame_canvas,width=1510, height=750, bg='white')
+        GENERAL_CANVAS = Canvas(frame_canvas,width=1515, height=700, bg='white')
         GENERAL_CANVAS.grid(row=0, column=0)
 
         scrollbar = Scrollbar(frame_canvas,orient="vertical",command=GENERAL_CANVAS.yview)       
@@ -1620,6 +1820,7 @@ class Win5():
         GENERAL_CANVAS.configure(yscrollcommand=scrollbar.set)
 
         frame_fotos = tk.Frame(GENERAL_CANVAS)
+        frame_fotos.configure(background='white')
         GENERAL_CANVAS.create_window((0,0), window=frame_fotos, anchor='nw')
         
         rows = 11
@@ -1642,8 +1843,9 @@ class Win5():
 
             for j in range (1, columns):
 
-                frames_grid[i][j] = Frame(frame_fotos)
-                frames_grid[i][j].config(width=300,height=300)
+                frames_grid[i][j] = tk.Frame(frame_fotos)
+
+                frames_grid[i][j].configure(width=300,height=300, background = 'white')
                 frames_grid[i][j].grid(row=i, column=j, sticky='n')
 
                 if(_num_fotos <= fotos_num):
@@ -1662,10 +1864,10 @@ class Win5():
                     precison_2_decimals = "%.4f" % precision
                     recall_2_decimals = "%.4f" % recall
                     
-                    lbl_precision = Label(frames_grid[i][j], text="P@" + str(_num_fotos) + "= " + str(precison_2_decimals) )
+                    lbl_precision = Label(frames_grid[i][j], text="P@" + str(_num_fotos) + "= " + str(precison_2_decimals) ,style='MT.TLabel')
                     lbl_precision.grid(row=1, column=1, sticky='w')
 
-                    lbl_recall = Label(frames_grid[i][j], text="R= " + str(recall_2_decimals))
+                    lbl_recall = Label(frames_grid[i][j], text="R= " + str(recall_2_decimals),style='MT.TLabel')
                     lbl_recall.grid(row=1,column=2, sticky='w')
 
                     _pack_sim = list_sim_50_photos[_num_fotos - 1]
@@ -1681,8 +1883,11 @@ class Win5():
                         F1 = 2*((precision * CR)/(precision + CR))                
 
                     else:
+
                         bg_color='red'
+
                         if(len(Clust_Recall_list) == 0):
+                            
                             CR = 0
                             F1 = 0
                         else:
@@ -1696,11 +1901,11 @@ class Win5():
                     F1_score_list.append(F1)
 
                     F1_2_decimals = "%.4f" % F1
-                    lbl_F1 = Label(frames_grid[i][j], text="F1@" + str(_num_fotos) + "= "+ str(F1_2_decimals))
+                    lbl_F1 = Label(frames_grid[i][j], text="F1@" + str(_num_fotos) + "= "+ str(F1_2_decimals),style='MT.TLabel')
                     lbl_F1.grid(row=2,column=1)
 
                     CR_2_decimals = "%.4f" % CR
-                    lbl_CR = Label(frames_grid[i][j], text = "CR@" + str(_num_fotos) + "= "+ str(CR_2_decimals))
+                    lbl_CR = Label(frames_grid[i][j], text = "CR@" + str(_num_fotos) + "= "+ str(CR_2_decimals),style='MT.TLabel')
                     lbl_CR.grid(row=2,column=2)
 
                     _lbl_number = tk.Label(frames_grid[i][j], text="ID: " + _name)
@@ -1731,7 +1936,7 @@ class Win5():
                     canvas_grid[i][j] = Canvas(frames_grid[i][j], width=300, height=300, bg='black')                
                     canvas_grid[i][j].grid(row=0, column=0)
                     _lbl_number = tk.Label(frames_grid[i][j], text="IMAGE "+str(_num_fotos))
-                    _lbl_number.grid(row=1, column=0, sticky='s')                           
+                    _lbl_number.grid(row=1, column=0, sticky=W)                           
 
                 _num_fotos += 1
                 cont_aux += 1
@@ -1741,17 +1946,17 @@ class Win5():
 
         AP_def = self.Calculate_AP(precission_list,AP_list,number_of_ones)
 
-        lbl_AP = Label(self.master, text = "AP@"+str(_num_fotos)+"= "+ str(AP_def))
+        lbl_AP = Label(self.master, text = "AP@"+str(_num_fotos)+"= "+ str(AP_def),style='AP.TLabel')
         lbl_AP.grid(row=2,column=0)
 
-        btt_graphics = Button(self.master, text="Graphics", command= lambda: self.MakeGraphics(precission_list,Cust_recall_graphic_list,F1_score_list))
+        btt_graphics = Button(self.master, text="Graphics", style='U.TButton', command= lambda: self.MakeGraphics(precission_list,Cust_recall_graphic_list,F1_score_list))
         btt_graphics.grid(row=2,column=1)
 
-        btt_pie_chart = Button(self.master, text="Pie Chart Similarity", command= lambda: self.MakePieChart(precission_list,number_of_ones))
+        btt_pie_chart = Button(self.master, text="Pie Chart Similarity", style='U.TButton', command= lambda: self.MakePieChart(precission_list,number_of_ones))
         btt_pie_chart.grid(row=2,column=2)
 
-        btt_close_window = Button(self.master, text="Close", command= lambda : self.CloseWindow(list_resized_photos,self.images_vector_jpg))
-        btt_close_window.grid(row=2,column=3)
+        btt_close_window = Button(self.master, text="Close", style='CB.TButton', command= lambda : self.CloseWindow(list_resized_photos,self.images_vector_jpg))
+        btt_close_window.grid(row=2,column=3,sticky=S,pady=20)
 
         #End loop For------------------
 
@@ -1824,12 +2029,12 @@ class Win5():
 
         return
 
-##-- End of Class 5: Win5 --##
+##-- End of Class 4: MetricWindow --##
 
 # ------------------------------------------
 root.configure(background='white')
 root.title("Mediaeval2016 Image Tool")
 root.geometry("%dx%d+%d+%d" % (width_window,height_window,coordinate_x,coordinate_y))
 
-app = Win1(root)
+app = Main(root)
 app.mainloop()

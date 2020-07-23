@@ -1,15 +1,16 @@
 Cluster_Number,Cluster_Name
-1,Professional Photo
-2,Close up
-3,Top View Round Pot
-4,Flowers Full Frame
-5,Square Pots
-6,Rock Pot
-7,Metalic Pot
-8,Garden
-9,Decorated Pots
-10,Indoor
-11,Yellow Flower
-12,Animals
-13,Singular Plant in Pot
-14,Uniform Background
+1,arrow sign
+2,black chalk on white background
+3,blackboard black
+4,blackboard chalk logos
+5,blackboard green
+6,colorfull writings
+7,drawings
+8,gray background
+9,purple background
+10,red background
+11,restaurant signs
+12,side sign
+13,sign like
+14,street writings
+15,wall edge

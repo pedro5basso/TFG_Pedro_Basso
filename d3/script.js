@@ -1,4 +1,4 @@
-function createBubbleChart(error, combinedClusterFile, titltetopic, filedclusterGT) {
+function createBubbleChart(error, combinedClusterFile, titltetopic, filedclusterGT, urlimages) {
 
 
   var num_topic = titltetopic.map(function(topic){return topic.NUM_TOPIC;});
@@ -13,6 +13,8 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
   var F = 0.5;
 
+  var s = urlimages.map(function(url){return url.URL;});
+  console.log(s);
     
   var img = document.createElement("img");
   var photo_id = document.getElementById("photo_id");
@@ -60,8 +62,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   CreateListClusters();
   AddTitle(num_topic,name_topic);
 
-
-  //Crea el SVG: a partir del id, ancho y largo, y el zoom
   function createSVG() {
       svg = d3.select("#bubble-chart")
         .append("svg")
@@ -71,6 +71,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
       })).append("g")
 
   }    
+  
   
 
   function ColorsFill() {
@@ -95,19 +96,19 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
           .append("circle")
           .attr("r", 10)
           .on("mouseover", function(d) {
-            updatePhotoInfo(d); //muesstra la info del ciculo: (ejemplo): nombre_país y población
+            updatePhotoInfo(d);
           })
           .on("mouseout", function(d) {
             updatePhotoInfo_();
           });
-      updateCircles(); // para el color de los circulos
+      updateCircles();
 
       function updatePhotoInfo(d) {
         
         
         if (d) {
           
-          var url = "http://localhost:8000/Desktop/TFG/Imagenes_TFG/"+ name_topic+"/"+d.ID_Photo.toString()+".jpg";
+          var url = s + "collection/" + name_topic+"/"+d.ID_Photo.toString()+".jpg";
           
           img.setAttribute("src",url);
           img.setAttribute("alt","image");
@@ -139,7 +140,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
       }
   }
 
-  //añade color a los círculos
   function updateCircles() {
 
     if(ColorsFill()){
@@ -157,8 +157,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
     }
 
   }
-  
-  
 
   function createForces() {
       var forceStrength = 0.05;
@@ -209,7 +207,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
       }
       
-      // var cluster = d.ID_ECluster;
       var clust_int = parseInt(cluster);
 
       if (cluster == '1' || clust_int % num_columns == 1) {
@@ -233,7 +230,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
         var cluster = d.ID_ECluster;
 
       }
-      // var cluster = d.ID_ECluster;
+
       var clust_int = parseInt(cluster);
       
 
@@ -261,8 +258,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
   }
   
-  
-
   function createForceSimulation_solutions() {
       forceSimulation = d3.forceSimulation()
         .force("x", forces.combine.x)
