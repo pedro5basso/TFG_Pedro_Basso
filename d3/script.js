@@ -14,7 +14,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   var F = 0.5;
 
   var s = urlimages.map(function(url){return url.URL;});
-  console.log(s);
     
   var img = document.createElement("img");
   var photo_id = document.getElementById("photo_id");
@@ -108,7 +107,10 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
         
         if (d) {
           
-          var url = s + "collection/" + name_topic+"/"+d.ID_Photo.toString()+".jpg";
+          //var url = s + "collection/" + name_topic+"/"+d.ID_Photo.toString()+".jpg";
+
+          var url = "images/collection/" + name_topic+"/"+d.ID_Photo.toString()+".jpg";
+          console.log(url);
           
           img.setAttribute("src",url);
           img.setAttribute("alt","image");
