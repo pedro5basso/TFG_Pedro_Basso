@@ -301,7 +301,7 @@ class Main(tk.Frame):
         lbl6.grid(row=5,column=2)
 
         var = IntVar()
-        R1 = Radiobutton(self._frame1, text="Check Results",style='U.TRadiobutton', variable=var, value=1, command= lambda: self.setFrame(var))
+        R1 = Radiobutton(self._frame1, text="Ground Truth",style='U.TRadiobutton', variable=var, value=1, command= lambda: self.setFrame(var))
         R1.grid(row=3,column=2,sticky='w')
 
         R2 = Radiobutton(self._frame1, text="Check Evaluations",style='U.TRadiobutton', variable=var, value=2, command= lambda: self.setFrame(var))
@@ -367,7 +367,7 @@ class Main(tk.Frame):
             
             self.new = Toplevel(self.master)
             self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
-            SolWindow(self.new, num_topic,root.filename,order_clusters,self.DADES16)
+            GroundTruthWindow(self.new, num_topic,root.filename,order_clusters,self.DADES16)
             
         else:
             print('Choose a folder!')
@@ -811,8 +811,8 @@ class ClusterRepresentation():
 
 # ------------------------------------------
 
-# Class 3: SolWindow 
-class SolWindow():
+# Class 3: GroundTruthWindow 
+class GroundTruthWindow():
 
     def __init__(self, master, num_topic,folder_topic,order_clusters, DADES16):
 
@@ -1394,7 +1394,7 @@ class SolWindow():
 
         return
 
-##-- End of Class 3: SolWindow --##
+##-- End of Class 3: GroundTruthWindow --##
 
 # ------------------------------------------
 

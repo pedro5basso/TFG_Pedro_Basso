@@ -1,18 +1,22 @@
 Cluster_Number,Cluster_Name
-1,Night
-2,Skater Green Space
-3,Black and White
-4,Skater Sun
-5,Skater Ramp Sun
-6,Skater Grinding Rail
-7,Brown Ramp
-8,Green Space and Red Floor
-9,Blue Object
-10,Skater on Ramp
-11,Skater and Crowd
-12,Dominant White
-13,Graffiti
-14,Skater up in the sky
-15,Street
-16,Artistic
-17,City Training Ground
+1,cars night view
+2,fireworks
+3,cars angle night view
+4,people night view
+5,candles
+6,people partial view
+7,people in focus
+8,people standing
+9,show
+10,people whole view
+11,daylight view
+12,details night view
+13,group of people
+14,other night views
+15,night side view
+16,cars approached view
+17,people on the street
+18,close-ups
+19,people singing
+20,children
+21,girl night view

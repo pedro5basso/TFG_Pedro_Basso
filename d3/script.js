@@ -6,7 +6,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
   var array_photos_cf = combinedClusterFile.map(function(photo){return photo.ID_Photo;});
   var array_clustersr_cf = combinedClusterFile.map(function(clust){return clust.ID_RCluster;});
-  var array_clusterse_cf = combinedClusterFile.map(function(photo){return photo.ID_ECluster;});
+  var array_clusterse_cf = combinedClusterFile.map(function(clust){return clust.ID_ECluster;});
 
   var array_clustnumber_dclusterGT = filedclusterGT.map(function(clust){return clust.Cluster_Number;});
   var array_clustname_dclusterGT = filedclusterGT.map(function(clust){return clust.Cluster_Name;});
@@ -43,7 +43,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   .domain(array_clusterse_cf.values()).range(ColorsEx);
 
 
-  var width = 1000,
+  var width = 600,
     height = 600;
   var svg,
     circles;
@@ -55,10 +55,11 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   createSVG();
   createCircles_solution();
   createForces();
-  createForceSimulation_solutions();
+  // createForceSimulation_solutions();
   addFillListener();
   addGroupingListeners();
   CreateListClusters();
+  CreateListClusters_File();
   AddTitle(num_topic,name_topic);
 
   function createSVG() {
@@ -72,15 +73,30 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   }    
   
   
+  // function ColorsFill() {
+  //     return isChecked("#colors");
+  // }
+  // function FileFill(){
+  //     return isChecked("#colorsfile");
+  //   }
 
-  function ColorsFill() {
-      return isChecked("#colors");
+
+  function GTCheck(){
+    return isChecked("#GroundTruth");
   }
   
-  function FileFill(){
-    return isChecked("#file");
+
+  function FSCheck(){
+    return isChecked("#FileSelected");
   }
+
+  // function C1Check(){
+  //   return isChecked("#Criterio1");
+  // }
   
+  // function C2Check(){
+  //   return isChecked("#Criterio2");
+  // }
 
   function  isChecked(elementID) {
       return d3.select(elementID).property("checked");
@@ -104,7 +120,6 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
       function updatePhotoInfo(d) {
         
-        
         if (d) {
           
           //var url = s + "collection/" + name_topic+"/"+d.ID_Photo.toString()+".jpg";
@@ -121,7 +136,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
           document.getElementById("Photos").appendChild(cluster_id);
           photo_id.innerHTML = "ID Photo: "+d.ID_Photo.toString();
           
-          if(!FileFill()){
+          if(!FSCheck()){
             cluster_id.innerHTML = "ID Cluster GT: "+d.ID_RCluster.toString();
           }else{
             
@@ -144,7 +159,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
   function updateCircles() {
 
-    if(ColorsFill()){
+    if(GTCheck()){
       circles
         .attr("fill", function(d) {
           return dclustersColorsScale(d.ID_RCluster);
@@ -161,18 +176,18 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   }
 
   function createForces() {
-      var forceStrength = 0.05;
+      // var forceStrength = 0.05;
 
       forces = {
-        combine:        createCombineForces(),
+        // combine:        createCombineForces(),
         solutions:      createSolutionsForces()
       };
 
-  function createCombineForces() {
-    return {
-      x: d3.forceX(width / 2).strength(forceStrength),
-      y: d3.forceY(height / 2).strength(forceStrength)
-    };
+  // function createCombineForces() {
+  //   return {
+  //     x: d3.forceX(width / 2).strength(forceStrength),
+  //     y: d3.forceY(height / 2).strength(forceStrength)
+  //   };
   }
 
   
@@ -182,6 +197,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
     var tam = 18;
     var num_columns = 5;
     var num_rows = 0;
+    var forceStrength = 0.05;
 
     if(tam % num_columns == 0){
       num_rows = tam / num_columns;
@@ -202,7 +218,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
     function continentForceX(d) {
 
-      if(!FileFill()){
+      if(!FSCheck()){
         var cluster = d.ID_RCluster;
       }else{
         var cluster = d.ID_ECluster;
@@ -226,7 +242,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
     function continentForceY(d) {
 
-      if(!FileFill()){
+      if(!FSCheck()){
         var cluster = d.ID_RCluster;
       }else{
         var cluster = d.ID_ECluster;
@@ -258,24 +274,24 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
   }
 
-  }
+  // }
   
-  function createForceSimulation_solutions() {
-      forceSimulation = d3.forceSimulation()
-        .force("x", forces.combine.x)
-        .force("y", forces.combine.y)
-        .force("collide", d3.forceCollide(12).strength(F));
-      forceSimulation.nodes(combinedClusterFile)
-        .on("tick", function() {
-          circles
-            .attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; });
-        });
-  }
+  // function createForceSimulation_solutions() {
+  // //     forceSimulation = d3.forceSimulation()
+  // //       .force("x", forces.combine.x)
+  // //       .force("y", forces.combine.y)
+  // //       .force("collide", d3.forceCollide(12).strength(F));
+  // //     forceSimulation.nodes(combinedClusterFile)
+  // //       .on("tick", function() {
+  // //         circles
+  // //           .attr("cx", function(d) { return d.x; })
+  // //           .attr("cy", function(d) { return d.y; });
+  // //       });
+  // }
   
 
   function addFillListener() {
-      d3.selectAll('input[name="fill"]')
+      d3.selectAll('input[name="grouping_fill"]')
         .on("change", function() {
           updateCircles();
         });
@@ -285,9 +301,13 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
   function addGroupingListeners() {
       
-      addListener("#combine",         forces.combine);
-      addListener("#solutions",       forces.solutions);
-      addListener("#file",       forces.solutions);
+      // addListener("#combine",         forces.combine);
+      // addListener("#solutions",       forces.solutions);
+      // addListener("#file",       forces.solutions);
+      addListener("#GT",forces.solutions);
+      // addListener("#FS",       forces.solutions);
+      // addListener("#C1",       forces.solutions);
+      // addListener("#C2",       forces.solutions);
 
       function addListener(selector, forces) {
           d3.select(selector).on("click", function() {
@@ -339,6 +359,32 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
     
   }
 
+  function CreateListClusters_File(){
+
+    for(i = 0; i < 30; i++){
+
+      var tr_element = document.createElement("TR");
+      var td_element_number = document.createElement("TD");
+      var td_element_color = document.createElement("TD");
+      var td_number = document.createTextNode((i + 1).toString());
+      var td_color = document.createTextNode("   ");
+      
+      td_element_color.setAttribute("bgcolor",ColorsEx[i]);
+      
+      
+      td_element_number.appendChild(td_number);
+      td_element_color.appendChild(td_color);
+        
+      tr_element.appendChild(td_element_number);
+      tr_element.appendChild(td_element_color);
+        
+      
+      document.getElementById("tablaClusters_File").appendChild(tr_element);
+
+      
+    }
+    return;
+  }
 
   function AddTitle(num_topic,name_topic)
   {
