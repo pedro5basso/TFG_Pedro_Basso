@@ -1,16 +1,18 @@
 Cluster_Number,Cluster_Name
-1,arrow sign
-2,black chalk on white background
-3,blackboard black
-4,blackboard chalk logos
-5,blackboard green
-6,colorfull writings
-7,drawings
-8,gray background
-9,purple background
-10,red background
-11,restaurant signs
-12,side sign
-13,sign like
-14,street writings
-15,wall edge
+1,Night
+2,Skater Green Space
+3,Black and White
+4,Skater Sun
+5,Skater Ramp Sun
+6,Skater Grinding Rail
+7,Brown Ramp
+8,Green Space and Red Floor
+9,Blue Object
+10,Skater on Ramp
+11,Skater and Crowd
+12,Dominant White
+13,Graffiti
+14,Skater up in the sky
+15,Street
+16,Artistic
+17,City Training Ground
