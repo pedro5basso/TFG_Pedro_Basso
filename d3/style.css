@@ -64,3 +64,12 @@ border-collapse: collapse;
 border: 1px solid #ddd;
 padding: 8px;
 }
+
+#tablaClusters_File{
+  border-collapse: collapse;
+  }
+
+#tablaClusters_File td, #tablaClusters_File th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  }
