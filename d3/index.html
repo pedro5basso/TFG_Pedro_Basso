@@ -19,11 +19,10 @@
     
     <tr>
         
-        <td style="padding-right:150px">
+        <td style="padding-right:50px">
         <div id="TablePart">
-            <p id="title">
-
-            </p>
+          <p>GROUND TRUTH</p>
+          <p id="title"></p>   
 
         <div id="info_clusters">
           <div >
@@ -51,20 +50,48 @@
                     <p id="cluster_id"></p>
                 </div>
                 <div id="controls">
+                  <!--
                     <span>
                         <label><input id="combine" type="radio" name="grouping" value="combine" checked>Combine</label>
                         <label><input id="solutions" type="radio" name="grouping" value="solutions">Ground Truth</label>
                         <label><input id="file" type="radio" name="grouping" value="file">File Selected</label>
                     </span>
                     <span>
-                        <label><input id="colors" type="radio" name="fill" value="colors" checked>Colors Solution</label>
-                        <label><input id="colorsfile" type="radio" name="fill" value="flags">Colors File</label>
+                        <label><input id="colors" type="radio" name="fill" value="colors" checked>Colors Ground Truth</label>
+                        <label><input id="colorsfile" type="radio" name="fill" value="flags">Colors File Selected</label>
+                    </span>
+                    -->
+                    <span>
+                      <label><input id="GroundTruth" type="radio" name="grouping_fill" value="GT" checked >Ground Truth</label>
+                      <label><input id="FileSelected" type="radio" name="grouping_fill" value="FS">File Selected</label>
+                      <!--
+                      <label><input id="Criterio1" type="radio" name="grouping_fill" value="C1">Criterio 1</label>
+                      <label><input id="Criterio2" type="radio" name="grouping_fill" value="C2">Criterio 2</label>
+                      -->
                     </span>
                 </div>
 
                 <div id="bubble-chart"></div>
                 
             </div>
+        </td>
+
+        <td style="padding-left:50px">
+
+          <p>FILE SELECTED</p>
+
+          <div >
+            <table id="tablaClusters_File">
+              <tr>
+
+                <th> Cluster</th>       
+                <th>Color</th>
+
+              </tr>
+
+            </table>
+
+          </div>  
         </td>
     </tr>
   

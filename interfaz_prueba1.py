@@ -857,8 +857,8 @@ class ClusterRepresentation():
 
 # ------------------------------------------
 
-# Class 3: SolWindow 
-class SolWindow():
+# Class 3: GroundTruthWindow 
+class GroundTruthWindow():
 
     def __init__(self, master, num_topic,folder_topic,order_clusters, DADES16):
 
@@ -1440,7 +1440,7 @@ class SolWindow():
 
         return
 
-##-- End of Class 3: SolWindow --##
+##-- End of Class 3: GroundTruthWindow --##
 
 # ------------------------------------------
 
