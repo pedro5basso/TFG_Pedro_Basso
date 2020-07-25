@@ -55,7 +55,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   createSVG();
   createCircles_solution();
   createForces();
-  // createForceSimulation_solutions();
+  createForceSimulation_solutions();
   addFillListener();
   addGroupingListeners();
   CreateListClusters();
@@ -82,6 +82,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
 
   function GTCheck(){
+    
     return isChecked("#GroundTruth");
   }
   
@@ -176,12 +177,13 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
   }
 
   function createForces() {
-      // var forceStrength = 0.05;
+    console.log("Dentro de createForces")
+    var forceStrength = 0.05;
 
-      forces = {
-        // combine:        createCombineForces(),
-        solutions:      createSolutionsForces()
-      };
+    forces = {
+      // combine:        createCombineForces(),
+      solutions:      createSolutionsForces()
+    };
 
   // function createCombineForces() {
   //   return {
@@ -218,7 +220,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
     function continentForceX(d) {
 
-      if(!FSCheck()){
+      if(!GTCheck()){
         var cluster = d.ID_RCluster;
       }else{
         var cluster = d.ID_ECluster;
@@ -242,7 +244,7 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
     function continentForceY(d) {
 
-      if(!FSCheck()){
+      if(!GTCheck()){
         var cluster = d.ID_RCluster;
       }else{
         var cluster = d.ID_ECluster;
@@ -276,18 +278,18 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
 
   // }
   
-  // function createForceSimulation_solutions() {
-  // //     forceSimulation = d3.forceSimulation()
-  // //       .force("x", forces.combine.x)
-  // //       .force("y", forces.combine.y)
-  // //       .force("collide", d3.forceCollide(12).strength(F));
-  // //     forceSimulation.nodes(combinedClusterFile)
-  // //       .on("tick", function() {
-  // //         circles
-  // //           .attr("cx", function(d) { return d.x; })
-  // //           .attr("cy", function(d) { return d.y; });
-  // //       });
-  // }
+  function createForceSimulation_solutions() {
+      forceSimulation = d3.forceSimulation()
+        .force("x", forces.solutions.x)
+        .force("y", forces.solutions.y)
+        .force("collide", d3.forceCollide(12).strength(F));
+      forceSimulation.nodes(combinedClusterFile)
+        .on("tick", function() {
+          circles
+            .attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; });
+        });
+  }
   
 
   function addFillListener() {
@@ -305,11 +307,12 @@ function createBubbleChart(error, combinedClusterFile, titltetopic, filedcluster
       // addListener("#solutions",       forces.solutions);
       // addListener("#file",       forces.solutions);
       addListener("#GT",forces.solutions);
-      // addListener("#FS",       forces.solutions);
+      addListener("#FS",forces.solutions);
       // addListener("#C1",       forces.solutions);
       // addListener("#C2",       forces.solutions);
 
       function addListener(selector, forces) {
+          
           d3.select(selector).on("click", function() {
               updateForces(forces);
           });
