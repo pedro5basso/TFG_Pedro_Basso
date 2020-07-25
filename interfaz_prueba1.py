@@ -149,6 +149,11 @@ style_chbtt.configure('U.TCheckbutton',
                     background='white')
 
 
+COLOR_LIST = ['silver','rosybrown', 'lightcoral','navy', 'maroon', 'tomato','sienna','peru','darkorange',
+                        'gold', 'olive', 'yellow','purple', 'yellowgreen', 'darkolivegreen','deeppink', 'lawngreen', 'lightgreen',
+                        'mediumaquamarine', 'turquoise', 'paleturquoise', 'darkcyan','aqua','deepskyblue', 'steelblue', 
+                        'dodgerblue', 'blueviolet','magenta', 'mediumvioletred',  'hotpink', 'crimson', 'pink', 'red']
+
 
 # Class 1: Main 
 class Main(tk.Frame):
@@ -213,7 +218,7 @@ class Main(tk.Frame):
             self.DADES16 = Dades16_
 
             self.URL_GT =  self.DADES16 + '/gt/'
-            self.URL_IMAGES =  self.DADES16 + 'images/collection/'
+            self.URL_IMAGES =  self.DADES16 + '/images/collection/'
             self.URL_XML = self.DADES16 + '/gt/all_topics.xml'
             self.URL_TXT_FILE = self.DADES16 + '/gt/all_topics.txt'
             self.ALL_TOPICS_FILE = self.URL_TXT_FILE 
@@ -301,7 +306,7 @@ class Main(tk.Frame):
         lbl6.grid(row=5,column=2)
 
         var = IntVar()
-        R1 = Radiobutton(self._frame1, text="Check Results",style='U.TRadiobutton', variable=var, value=1, command= lambda: self.setFrame(var))
+        R1 = Radiobutton(self._frame1, text="Ground Truth",style='U.TRadiobutton', variable=var, value=1, command= lambda: self.setFrame(var))
         R1.grid(row=3,column=2,sticky='w')
 
         R2 = Radiobutton(self._frame1, text="Check Evaluations",style='U.TRadiobutton', variable=var, value=2, command= lambda: self.setFrame(var))
@@ -334,43 +339,83 @@ class Main(tk.Frame):
         lbl2 = Label(self._frame2,text="      ", style='E.TLabel')
         lbl2.grid(row=1,column=0)
 
-        goButton = Button(self._frame2, text = "Choose Folder " , style='U.TButton',command = self.ResultsWindow)
-        goButton.grid(row = 5, column = 3)
+        # goButton = Button(self._frame2, text = "Choose Folder " , style='U.TButton',command = self.ResultsWindow)
+        # goButton.grid(row = 5, column = 3)
 
-        TopicListButton = Button(self._frame2,text="Topic List" , style='U.TButton',  command=self.TopicList)
-        TopicListButton.grid(row=5, column=4)
+        # TopicListButton = Button(self._frame2,text="Topic List" , style='U.TButton',  command=self.TopicList)
+        # TopicListButton.grid(row=5, column=4)
+        
+
+        self.MakeTopicListItem()
 
         ClusterCheckButton = Checkbutton(self._frame2,text="Order by Cluster", style='U.TCheckbutton', variable=self.CheckVarClusters, onvalue=1, offvalue=0)
-        ClusterCheckButton.grid(row=6,column=3,sticky='w')
+        ClusterCheckButton.grid(row=7,column=2,sticky='w')
 
         return
 
-    def ResultsWindow(self):
+    def ResultsWindow(self,topic):
 
         order_clusters = self.CheckVarClusters.get()
-        root.filename =  filedialog.askdirectory()
+        # root.filename =  filedialog.askdirectory()
+        url_folder = self.URL_IMAGES + 'topic'+str(topic[0])
+        num_topic_ = str(topic[0])
         
-        url_list = root.filename.split('/')
-        folder_name = url_list[-1]
+        # url_list = root.filename.split('/')
+        # folder_name = url_list[-1]
 
-        if(folder_name != ''):
+        # if(folder_name != ''):
 
-            file_all_topics = open(self.ALL_TOPICS_FILE,"r")
+        # file_all_topics = open(self.ALL_TOPICS_FILE,"r")
 
-            for i in range(0, NUMBER_OF_TOPICS):
+        # for i in range(0, NUMBER_OF_TOPICS):
 
-                line = file_all_topics.readline()            
-                list_line = line.split()
+        #     line = file_all_topics.readline()            
+        #     list_line = line.split()
 
-                if(list_line[1] == folder_name or folder_name == 'topic'+list_line[0]):
-                    num_topic = list_line[0]
+        #     if(list_line[1] == folder_name or folder_name == 'topic'+list_line[0]):
+        #         num_topic = list_line[0]
+        
+        self.new = Toplevel(self.master)
+        self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
+        SolWindow(self.new, num_topic_,url_folder,order_clusters,self.DADES16)
             
-            self.new = Toplevel(self.master)
-            self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
-            SolWindow(self.new, num_topic,root.filename,order_clusters,self.DADES16)
-            
-        else:
-            print('Choose a folder!')
+        # else:
+        #     print('Choose a folder!')
+
+        return
+
+    def MakeTopicListItem(self):
+
+        file_topics_numbers = open(self.URL_TXT_FILE,"r")
+
+        list_topic_names = []
+
+        for i in range(0, NUMBER_OF_TOPICS):
+
+            line = file_topics_numbers.readline()            
+            list_line = line.split()
+            list_topic_names.append(list_line)
+
+        cnames = StringVar(value=list_topic_names)
+
+        lbox = Listbox(self._frame2, listvariable=cnames, height=5)
+        lbox.grid(row = 5, column = 2, columnspan=4)
+
+        for i in range(0,len(list_topic_names),2):
+            lbox.itemconfigure(i, background='#f0f0ff')
+
+        
+        TopicListButton = Button(self._frame2,text="See Topic" , style='U.TButton', command= lambda: self.ItemSelected(lbox,list_topic_names))
+        TopicListButton.grid(row=8, column=2)
+
+        return
+
+    def ItemSelected(self,lbox,list_topic_names):
+
+        a = lbox.curselection()
+        topic = list_topic_names[a[0]]
+
+        self.ResultsWindow(topic)
 
         return
 
@@ -412,10 +457,6 @@ class Main(tk.Frame):
         canvas.config(scrollregion=canvas.bbox("all"))
 
 
-        return
-
-    def TopicSelected(self):
-        print("a")
         return
 
     def MakeEvalPart(self):
@@ -828,12 +869,12 @@ class SolWindow():
         
         self.MakeURLS(DADES16)
 
-        Color_List = ['silver','rosybrown', 'lightcoral','navy', 'maroon', 'red', 'tomato','sienna','peru','darkorange',
-                        'gold', 'olive', 'yellow','purple', 'yellowgreen', 'darkolivegreen','deeppink', 'lawngreen', 'lightgreen',
-                        'mediumaquamarine', 'turquoise', 'paleturquoise', 'darkcyan','aqua','deepskyblue', 'steelblue', 
-                        'dodgerblue', 'blueviolet','magenta', 'mediumvioletred',  'hotpink', 'crimson', 'pink']
+        # Color_List = ['silver','rosybrown', 'lightcoral','navy', 'maroon', 'red', 'tomato','sienna','peru','darkorange',
+        #                 'gold', 'olive', 'yellow','purple', 'yellowgreen', 'darkolivegreen','deeppink', 'lawngreen', 'lightgreen',
+        #                 'mediumaquamarine', 'turquoise', 'paleturquoise', 'darkcyan','aqua','deepskyblue', 'steelblue', 
+        #                 'dodgerblue', 'blueviolet','magenta', 'mediumvioletred',  'hotpink', 'crimson', 'pink']
 
-        name_topic = self.FrameUP(num_topic,Color_List)
+        name_topic = self.FrameUP(num_topic)
 
         list_similarity,list_images_rgt = self.ReadRGTFile(num_topic,name_topic)
         
@@ -849,7 +890,7 @@ class SolWindow():
             list_images_url = self.Reading_folder_images(num_topic,folder_topic,list_images_dgt)
             list_images_resized =  self.ResizePhotos(list_images_url,aux)        
 
-        self.FramesDown(list_images_url,num_topic,name_topic,Color_List,list_images_resized,order_clusters,list_similarity,list_clus_belong_photos)
+        self.FramesDown(list_images_url,num_topic,name_topic,list_images_resized,order_clusters,list_similarity,list_clus_belong_photos)
         
         return
 
@@ -866,12 +907,12 @@ class SolWindow():
 
         return
 
-    def FrameUP(self,num_topic,Color_List):
+    def FrameUP(self,num_topic):
         
         name_topic = self.Read_topics_file(num_topic)
         Label_Topic = Label(self.frame, text = "TOPIC "+ num_topic +": "+ name_topic, style='Tit.TLabel')
 
-        Button_Legend = Button(self.frame, text="Legend", style='U.TButton', command= lambda: self.LegendFrame(num_topic,name_topic,Color_List))
+        Button_Legend = Button(self.frame, text="Legend", style='U.TButton', command= lambda: self.LegendFrame(num_topic,name_topic))
 
         label_empty_1 = Label(self.frame, text="   ", style='E.TLabel')
         label_empty_2 = Label(self.frame, text="   ", style='E.TLabel')
@@ -910,7 +951,7 @@ class SolWindow():
 
         return (name_topic)
 
-    def LegendFrame(self, num_topic,name_topic,Color_List):
+    def LegendFrame(self, num_topic,name_topic):
 
         self.new = Toplevel(self.frame)        
         self.new.geometry("320x300")
@@ -939,7 +980,7 @@ class SolWindow():
             
             lbl = Label(frame_labels, text="Cluster "+str(i + 1) + ": "+ list_cluster_in_topic[i], style='UL.TLabel')
             lbl.grid(row=i, column=0, sticky='e')
-            canvas_color = Canvas(frame_labels, height=30, bg=Color_List[i])
+            canvas_color = Canvas(frame_labels, height=30, bg=COLOR_LIST[i])
             canvas_color.grid(row=i,column=1)
 
         frame_labels.update_idletasks()
@@ -1123,7 +1164,7 @@ class SolWindow():
 
         return list_photo_type
 
-    def FramesDown(self,images_vector,num_topic, name_topic,Color_List,images_vector_jpg,order_clusters,list_similarity,list_clus_belong_photos):
+    def FramesDown(self,images_vector,num_topic, name_topic,images_vector_jpg,order_clusters,list_similarity,list_clus_belong_photos):
         
         frame_canvas = Frame(self.frame)
         frame_canvas.grid(row=1, column=0, columnspan=5, sticky='nw')
@@ -1232,7 +1273,7 @@ class SolWindow():
                         if(not aux):
                             number_of_1 += 1
 
-                        color_bckgrn,number_cluster = self.SetColorCluster(url_image,list_clus_belong_photos,Color_List)
+                        color_bckgrn,number_cluster = self.SetColorCluster(url_image,list_clus_belong_photos)
                         canvas_grid[i][j].config(bg=color_bckgrn)
 
                         bckgrnd_lbl = 'green'
@@ -1265,7 +1306,7 @@ class SolWindow():
           
         GENERAL_CANVAS.config(scrollregion=GENERAL_CANVAS.bbox("all"))
         
-        btt_grapics_clusters = Button(self.frame, text="Pie Chart Clusters", style='U.TButton', command = lambda: self.PieChartGraphicCluster(name_topic,num_topic,list_clus_belong_photos,Color_List))
+        btt_grapics_clusters = Button(self.frame, text="Pie Chart Clusters", style='U.TButton', command = lambda: self.PieChartGraphicCluster(name_topic,num_topic,list_clus_belong_photos))
         btt_grapics_clusters.grid(row=2,column=2)
 
         if(order_clusters == 0):
@@ -1315,7 +1356,7 @@ class SolWindow():
 
         return (sim)
 
-    def SetColorCluster(self,url_image,list_clus_belong_photos,Color_List):
+    def SetColorCluster(self,url_image,list_clus_belong_photos):
 
         search = False
         size_list = len(list_clus_belong_photos)
@@ -1337,13 +1378,13 @@ class SolWindow():
             number_cluster = aux_[1]
 
             try:         
-                color = Color_List[int(number_cluster) - 1]
+                color = COLOR_LIST[int(number_cluster) - 1]
             except:
-                color = Color_List[0]
+                color = COLOR_LIST[0]
 
         return(color,number_cluster)
 
-    def PieChartGraphicCluster(self,name_topic,num_topic,list_clus_belong_photos,Color_List):
+    def PieChartGraphicCluster(self,name_topic,num_topic,list_clus_belong_photos):
 
         list_clust = self.ReadDclusterGT(num_topic,name_topic)
         num_clust = len(list_clust)
@@ -1356,7 +1397,7 @@ class SolWindow():
         
         for i in range(0,num_clust):
             n_times = clusters_numbers.count(i+1)
-            colors.append(Color_List[i])
+            colors.append(COLOR_LIST[i])
             list_n_times.append(n_times)
 
         _labels = []
@@ -1468,12 +1509,58 @@ class MetricWindow():
         self.master.configure(background='white')
 
         lbl_filename = Label(self.master, text="FILE SELECTED: " + filename, style='Tit.TLabel')
+        # lbl_filename = Label(self.master, text="FILE SELECTED: " + filename)
         lbl_filename.grid(row=0,column=1)
 
         lbl_topic_info = Label(self.master, text="Topic "+num_topic + ": "+ name_topic,  style='Tit.TLabel' )
-        lbl_topic_info.grid(row=0,column=3)
+        # lbl_topic_info = Label(self.master, text="Topic "+num_topic + ": "+ name_topic )
+        lbl_topic_info.grid(row=0,column=2)
+
+        Button_Legend = Button(self.master, text="Legend", style='U.TButton', command= lambda: self.LegendFrame(num_topic,name_topic))
+        # Button_Legend = Button(self.master, text="Legend", style='U.TButton')
+        Button_Legend.grid(row=0,column=3)
+
+
         
         return(num_topic,name_topic)
+
+    def LegendFrame(self, num_topic,name_topic):
+
+        self.new = Toplevel(self.frame)        
+        self.new.geometry("320x300")
+        self.new.title("Legend Window")
+        
+        num_clusters,list_cluster_in_topic = self.ReadDclusterGT(num_topic,name_topic)
+
+        frame_canvas = tk.Frame(self.new)
+        frame_canvas.grid(row=0,column=0,columnspan=3)
+
+        canvas = Canvas(frame_canvas, width=300, height=300)
+        canvas.grid(row=0,column=0)
+
+        scrollbar = Scrollbar(frame_canvas,orient="vertical",command=canvas.yview)       
+        scrollbar.grid(row=0, column=1, sticky='ns')
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        frame_labels = tk.Frame(canvas)
+        frame_labels.configure(background='white')
+        canvas.create_window(0,0,window=frame_labels, anchor='nw')
+
+        tam = len(list_cluster_in_topic)
+
+        for i in range(0,tam):
+            
+            lbl = Label(frame_labels, text="Cluster "+str(i + 1) + ": "+ list_cluster_in_topic[i], style='UL.TLabel')
+            lbl.grid(row=i, column=0, sticky='e')
+            canvas_color = Canvas(frame_labels, height=30, bg=COLOR_LIST[i])
+            canvas_color.grid(row=i,column=1)
+
+        frame_labels.update_idletasks()
+
+        canvas.config(scrollregion=canvas.bbox("all"))
+
+        return
 
     def Extract_Number_of_filename(self, filename):
 
@@ -1532,13 +1619,13 @@ class MetricWindow():
 
         list_sim_50_photos,number_of_ones,AP_list = self.Make50similarityList(list_rgt,result_list)
 
-        num_of_clusters = self.ReadDclusterGT(num_topic,name_topic)
+        num_of_clusters,list_clusters = self.ReadDclusterGT(num_topic,name_topic)
         
         list_clust_50 = self.Make50ClusterList(list_dgt,result_list)
         
         list_n_times_clust = self.MakeList_Compute_ClusterR(list_clust_50)
         
-        self.MakeBotFrame(num_topic, name_topic,list_resized_photos,list_sim_50_photos,number_of_ones,AP_list,num_of_clusters,list_n_times_clust)
+        self.MakeBotFrame(num_topic, name_topic,list_resized_photos,list_sim_50_photos,number_of_ones,AP_list,num_of_clusters,list_n_times_clust,list_dgt)
 
         return
 
@@ -1741,16 +1828,19 @@ class MetricWindow():
             dclusterGT_file = io.open(filename, 'r')
 
         list_cluster_topic = []
+        list_cluster_topic_names = []
 
         for i in range(0, int(count)):
 
             line = dclusterGT_file.readline()
             list_line = line.split(',')               
             list_cluster_topic.append(list_line[0])
+            list_cluster_topic_names.append(list_line[1])
+
 
         dclusterGT_file.close()
 
-        return (len(list_cluster_topic))
+        return (len(list_cluster_topic),list_cluster_topic_names )
 
     def Make50ClusterList(self,list_dgt,result_list):
 
@@ -1810,7 +1900,7 @@ class MetricWindow():
 
         return(def_list)
 
-    def MakeBotFrame(self,num_topic, name_topic,list_resized_photos,list_sim_50_photos,number_of_ones,AP_list,num_of_clusters,list_n_times_clust):
+    def MakeBotFrame(self,num_topic, name_topic,list_resized_photos,list_sim_50_photos,number_of_ones,AP_list,num_of_clusters,list_n_times_clust,list_dgt):
 
         precission_list = []
         Clust_Recall_list = []
@@ -1885,7 +1975,11 @@ class MetricWindow():
 
                     if(sim_image == '1'):
 
-                        bg_color='green'
+                        # SetColorCluster(self,url_image,list_clus_belong_photos,Color_List):
+
+                        bg_color_ = self.SetColorCluster(_pack_sim[0],list_dgt)
+                        bg_color = bg_color_[0]
+                        belong_cluster = True
 
                         CR = list_n_times_clust[cont_aux -1] / num_of_clusters
                         Clust_Recall_list.append(CR)
@@ -1895,6 +1989,7 @@ class MetricWindow():
                     else:
 
                         bg_color='red'
+                        belong_cluster = False
 
                         if(len(Clust_Recall_list) == 0):
                             
@@ -1918,7 +2013,14 @@ class MetricWindow():
                     lbl_CR = Label(frames_grid[i][j], text = "CR@" + str(_num_fotos) + "= "+ str(CR_2_decimals),style='MT.TLabel')
                     lbl_CR.grid(row=2,column=2)
 
-                    _lbl_number = tk.Label(frames_grid[i][j], text="ID: " + _name)
+                    if(belong_cluster):
+                        clust_num = bg_color_[1]
+                        _lbl_number = tk.Label(frames_grid[i][j], text="Cluster "+str(clust_num) + _name)
+                    else:
+                        clust_num = 0
+                        _lbl_number = tk.Label(frames_grid[i][j], text="NO Cluster " + _name)
+
+                    
                     _lbl_number.config(bg=bg_color)
                     _lbl_number.grid(row=1, column=0, sticky='s')
 
@@ -1975,6 +2077,34 @@ class MetricWindow():
         GENERAL_CANVAS.config(scrollregion=GENERAL_CANVAS.bbox("all"))
 
         return
+
+    def SetColorCluster(self,url_image,list_clus_belong_photos):
+
+        search = False
+        size_list = len(list_clus_belong_photos)
+        counter = 0
+        while((counter < size_list) and (not search)):
+
+            aux = list_clus_belong_photos[counter]
+            image = aux[0]
+
+            if(url_image == image):
+                index = counter
+                search = True
+
+            counter += 1
+        
+        if(search):
+
+            aux_ = list_clus_belong_photos[index]
+            number_cluster = aux_[1]
+
+            try:         
+                color = COLOR_LIST[int(number_cluster) - 1]
+            except:
+                color = COLOR_LIST[0]
+
+        return(color,number_cluster)
 
     def Calculate_AP(self,precission_list,AP_list,number_of_ones):
 
