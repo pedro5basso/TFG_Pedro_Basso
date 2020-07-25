@@ -403,14 +403,19 @@ class Main(tk.Frame):
 
             line = file_topics_numbers.readline()            
             list_line = line.split()
-            lbl = Label(frame_labels, text="-Topic "+list_line[0] + ": "+ list_line[1], style='UL.TLabel')
+            lbl = Button(frame_labels, text="-Topic "+list_line[0] + ": "+ list_line[1], style='UL.TLabel', command=self.TopicSelected())
             lbl.grid(row=i, column=0, sticky='w')
+            # print(lbl.grid_info()["row"])
 
         frame_labels.update_idletasks()
 
         canvas.config(scrollregion=canvas.bbox("all"))
 
 
+        return
+
+    def TopicSelected(self):
+        print("a")
         return
 
     def MakeEvalPart(self):
