@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="style.css" rel="stylesheet">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+  <script src="script.js"></script>
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <title>Cluster Representation</title>
+</head>
+<body>
+    
+<table>
+    
+  <div id="General" style="display:row;">
+
+    <tr>
+        
+        <td style="padding-right:50px">
+          <div id="TablePart">
+            <p>GROUND TRUTH</p>
+            <p id="title"></p>   
+
+            <div id="info_clusters">
+              <div >
+                <table id="tablaClusters">
+                  <tr>
+
+                    <th>Number</th>        
+                    <th>Name</th>        
+                    <th>Color</th>
+
+                  </tr>
+
+                  <tr>
+                    <td>--</td>        
+                    <td>NO CLUSTER</td>        
+                    <td style="background-color: black;">        </td>
+
+                  </tr>
+
+                </table>
+
+              </div>    
+            </div>
+          </div>
+        </td>
+
+        <td >
+            <div id="country-info"></div>
+            <div id="ControlPart">
+                <div id="Photos" style="width: 400px; height: 300px; align-items: center">
+                    <p id="photo_id"></p>
+                    <p id="cluster_id"></p>
+                </div>
+                <div id="controls">
+                  <!--
+                    <span>
+                        <label><input id="combine" type="radio" name="grouping" value="combine" checked>Combine</label>
+                        <label><input id="solutions" type="radio" name="grouping" value="solutions">Ground Truth</label>
+                        <label><input id="file" type="radio" name="grouping" value="file">File Selected</label>
+                    </span>
+                    <span>
+                        <label><input id="colors" type="radio" name="fill" value="colors" checked>Colors Ground Truth</label>
+                        <label><input id="colorsfile" type="radio" name="fill" value="flags">Colors File Selected</label>
+                    </span>
+                    -->
+                    <span>
+                      
+                      <label><input id="GroundTruth" type="radio" name="grouping_fill" value="GT">Ground Truth</label>
+                      <label><input id="FileSelected" type="radio" name="grouping_fill" value="FS">File Selected</label>
+                      <label><input id="Comparation" type="radio" name="grouping_fill" value="C">Comparation</label>
+                      <!--
+                      <label><input id="Criterio1" type="radio" name="grouping_fill" value="C1">Criterio 1</label>
+                      <label><input id="Criterio2" type="radio" name="grouping_fill" value="C2">Criterio 2</label>
+                      -->
+                    </span>
+                </div>
+
+                <div id="bubble-chart"></div>
+                
+            </div>
+        </td>
+
+        <td style="padding-left:50px">
+
+          <div id="TablePart">
+            <p>FILE SELECTED</p>
+
+            <div>
+              <table id="tablaClusters_File" style="border-collapse: collapse;">
+                <tr style="border: 1px solid #ddd;
+                padding: 8px;">
+
+                  <th style="border: 1px solid #ddd;
+                  padding: 8px;">Cluster</th>       
+                  <th style="border: 1px solid #ddd;
+                  padding: 8px;">Color</th>
+
+                  <th style="border: 1px solid #ddd;
+                  padding: 8px;">Cluster</th>       
+                  <th style="border: 1px solid #ddd;
+                  padding: 8px;">Color</th>
+
+                </tr>
+
+              </table>
+            </div>
+
+          </div>  
+        </td>
+
+    </tr>
+
+
+  </div>
+    
+</table>
+
+
+
+<script>
+    
+  d3.queue()
+    .defer(d3.csv, "files/combinedClusterFile.txt")
+    .defer(d3.csv, "files/titletopic.txt")
+    .defer(d3.csv, "files/filedclusterGT.txt")
+    .defer(d3.csv, "files/urlimages.txt")
+    .await(createBubbleChart);
+
+
+</script>
+
+</body>
+</html>

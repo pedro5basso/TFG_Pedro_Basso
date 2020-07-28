@@ -24,8 +24,8 @@ root = tk.Tk()
 NUMBER_OF_TOPICS = 135
 
 #variables for screen dimension
-width_window = 430
-height_window = 190
+width_window = 460
+height_window = 250
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
@@ -212,7 +212,7 @@ class Main(tk.Frame):
             f = open(f_url,'r')
 
             Dades16  = f.readline()
-            URL_D3_FILES =  '/d3/files'
+            URL_D3_FILES =  '/files'
 
             Dades16_ = Dades16.replace('\n','')
             self.DADES16 = Dades16_
@@ -377,7 +377,7 @@ class Main(tk.Frame):
         
         self.new = Toplevel(self.master)
         self.new.geometry(str(screen_width+100) + 'x' + str(screen_height))
-        SolWindow(self.new, num_topic_,url_folder,order_clusters,self.DADES16)
+        GroundTruthWindow(self.new, num_topic_,url_folder,order_clusters,self.DADES16)
             
         # else:
         #     print('Choose a folder!')
@@ -557,7 +557,7 @@ class ClusterRepresentation():
     def MakeURLS(self,DADES16):
 
         self.URL_IMAGES =  DADES16 + '/images/collection/'
-        self.URL_D3_FILES =  'd3/files/'
+        self.URL_D3_FILES =  'files/'
         self.URL_GT =  DADES16 + '/gt'
 
         self.URL_GT_DEVSET_DGT = self.URL_GT + '/devset/dGT/'
@@ -723,36 +723,70 @@ class ClusterRepresentation():
     def BuildClusterDefFile(self,filename_path,list_dgt):
 
         list_examination_cluster = self.ReadClusterFile(filename_path)
+        # print(list_dgt)
 
         size_list_solution = len(list_dgt)
         size_list_ex = len(list_examination_cluster)
-        counter1 = 0
+        # counter1 = 0
+        counter1 = 1
         
         def_list_cluster = []
 
-        while(counter1 < size_list_solution):
+        # while(counter1 < size_list_solution):
 
-            comb_r = list_dgt[counter1]
-            comb_r_ = comb_r.split(',')
-            id_photo_r = comb_r_[0]
-            id_cluster_r = int(comb_r_[-1])
+        #     comb_r = list_dgt[counter1]
+        #     comb_r_ = comb_r.split(',')
+        #     id_photo_r = comb_r_[0]
+        #     id_cluster_r = int(comb_r_[-1])
+
+        #     search = False
+        #     counter2 = 1
+
+        #     while((counter2 < size_list_ex) and (not search)):
+                
+        #         comb_e = list_examination_cluster[counter2]
+        #         id_photo_e = comb_e[0]
+        #         if(int(id_photo_r) == int(id_photo_e)):
+        #             id_cluster_e = comb_e[1]                  
+        #             def_list = id_photo_r+','+str(id_cluster_r)+','+id_cluster_e
+        #             def_list_cluster.append(def_list)
+        #             search = True
+
+        #         counter2 += 1
+
+        #     counter1 += 1
+
+        # GT --> Ground Truth
+        # FS --> File Selected
+
+        while(counter1 < size_list_ex):
+
+            tuple_FS = list_examination_cluster[counter1]
+            id_photo_FS = tuple_FS[0]
+            id_cluster_FS = tuple_FS[1]
 
             search = False
-            counter2 = 1
+            counter2 = 0
 
-            while((counter2 < size_list_ex) and (not search)):
+            while((counter2 < size_list_solution) and (not search)):
                 
-                comb_e = list_examination_cluster[counter2]
-                id_photo_e = comb_e[0]
-                if(int(id_photo_r) == int(id_photo_e)):
-                    id_cluster_e = comb_e[1]                  
-                    def_list = id_photo_r+','+str(id_cluster_r)+','+id_cluster_e
+                element_GT = list_dgt[counter2]
+                touple_GT = element_GT.split(',')
+                id_photo_GT = touple_GT[0]
+                id_cluster_GT = touple_GT[1]
+                if(int(id_photo_FS) == int(id_photo_GT)):              
+                    def_list = str(id_photo_FS)+','+str(int(id_cluster_GT))+','+str(int(id_cluster_FS))+'\n'
                     def_list_cluster.append(def_list)
                     search = True
 
                 counter2 += 1
-            
+
+            if(search == False):
+                def_list = str(int(id_photo_FS))+',0,'+str(int(id_cluster_FS))+'\n'
+                def_list_cluster.append(def_list)
+
             counter1 += 1
+
 
         return(def_list_cluster)
 

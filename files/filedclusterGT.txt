@@ -1,0 +1,25 @@
+Cluster_Number,Cluster_Name
+1,2 fan blades
+2,3 fan blades
+3,4 fan blades
+4,5 fan blades
+5,black and white detail
+6,colorful lamps
+7,dark light condition
+8,fan and room
+9,fan behind protective grid
+10,fan in reflection
+11,fan in side perspective
+12,fan shadow
+13,industrial ceiling
+14,lamp in focus
+15,metallic fan
+16,mounting a fan
+17,multiple fans mounted together
+18,person in focus
+19,rotating fan
+20,shop full of fans
+21,single fan light in dark
+22,tripple fan light in dark
+23,two fans in focus
+24,victorian fan
