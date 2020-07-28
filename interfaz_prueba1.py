@@ -24,8 +24,8 @@ root = tk.Tk()
 NUMBER_OF_TOPICS = 135
 
 #variables for screen dimension
-width_window = 460
-height_window = 250
+width_window = 500
+height_window = 300
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
@@ -42,7 +42,7 @@ coordinate_y = (screen_height/2) - (height_window/2)
 # Buttons
 style_button = Style()
 style_button.configure('U.TButton', 
-                            font =('arial', 10, 'bold'),
+                            font =('arial', 13, 'bold'),
                             foreground='black', 
                             background='black')
 
@@ -67,7 +67,7 @@ style_label_aux.configure('E.TLabel',
 
 style_label = Style()
 style_label.configure('U.TLabel',
-                    font =('arial', 9, 'bold'),
+                    font =('arial', 11, 'bold'),
                     foreground='black', 
                     background='white')
 
@@ -137,14 +137,14 @@ style_lbl_AP.configure('AP.TLabel',
 # RadioButton
 style_rbtt = Style()
 style_rbtt.configure('U.TRadiobutton',
-                    font =('arial', 9, 'bold'),
+                    font =('arial', 12, 'bold'),
                     foreground='black', 
                     background='white')
 
 # CheckButton
 style_chbtt = Style()
 style_chbtt.configure('U.TCheckbutton',
-                    font =('arial', 9, 'bold'),
+                    font =('arial', 12, 'bold'),
                     foreground='black', 
                     background='white')
 
@@ -297,7 +297,7 @@ class Main(tk.Frame):
         lbl3.grid(row=2,column=0)
 
         lbl4 = Label(self._frame1,text="      ", style='E.TLabel')
-        lbl4.grid(row=3,column=0)
+        lbl4.grid(row=3,column=0) 
 
         lbl5 = Label(self._frame1,text="      ", style='E.TLabel')
         lbl5.grid(row=3,column=1)
@@ -305,15 +305,18 @@ class Main(tk.Frame):
         lbl6 = Label(self._frame1,text="      ", style='E.TLabel')
         lbl6.grid(row=5,column=2)
 
+        lbl7 = Label(self._frame1,text="      ", style='E.TLabel')
+        lbl7.grid(row=3,column=2)
+
         var = IntVar()
         R1 = Radiobutton(self._frame1, text="Ground Truth",style='U.TRadiobutton', variable=var, value=1, command= lambda: self.setFrame(var))
-        R1.grid(row=3,column=2,sticky='w')
+        R1.grid(row=8,column=2,sticky='w')
 
         R2 = Radiobutton(self._frame1, text="Check Evaluations",style='U.TRadiobutton', variable=var, value=2, command= lambda: self.setFrame(var))
-        R2.grid(row=4,column=2,sticky='w')
+        R2.grid(row=9,column=2,sticky='w')
 
         bttExit = Button(self._frame1,text="Exit", style='C.TButton' , command= self.Exit)
-        bttExit.grid(row = 6, column = 2,sticky='w')
+        bttExit.grid(row = 10, column = 2,sticky='w')
  
         return
 
@@ -398,7 +401,7 @@ class Main(tk.Frame):
 
         cnames = StringVar(value=list_topic_names)
 
-        lbox = Listbox(self._frame2, listvariable=cnames, height=5)
+        lbox = Listbox(self._frame2, listvariable=cnames,width=40 ,height=7)
         lbox.grid(row = 5, column = 2, columnspan=4)
 
         for i in range(0,len(list_topic_names),2):
@@ -475,20 +478,20 @@ class Main(tk.Frame):
         lbl3.grid(row=0,column=1)
 
         lbl3 = Label(self._frame2,text="      ", style='E.TLabel')
-        lbl3.grid(row=3,column=1)
+        lbl3.grid(row=2,column=1)
         
 
         lbl_title_results = Label(self._frame2, text="Results File", style='U.TLabel')
-        lbl_title_results.grid(row=1,column=1)
+        lbl_title_results.grid(row=3,column=1)
         
         btt_selesct_file = Button(self._frame2, text="Select the Results file", style='U.TButton' , command = self.CheckResultwindow)
-        btt_selesct_file.grid(row=2,column=1)
+        btt_selesct_file.grid(row=4,column=1)
 
         lbl_title_clusters = Label(self._frame2, text="Clusters File" , style='U.TLabel')
-        lbl_title_clusters.grid(row=4,column=1)
+        lbl_title_clusters.grid(row=6,column=1)
         
         btt_clusters = Button(self._frame2, text="Select the Clusters file", style='U.TButton' , command=self.CheckClustersWindow)
-        btt_clusters.grid(row=5, column=1)
+        btt_clusters.grid(row=7, column=1)
 
         return
 
