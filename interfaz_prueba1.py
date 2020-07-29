@@ -1492,10 +1492,12 @@ class MetricWindow():
 
         self.MakeURLS(DADES16)
 
-        result_list = self.ReadEvalFile(path_filename)
+        result_list,number_topic = self.ReadEvalFile(path_filename)
 
-        num_topic,name_topic = self.Top_Frame(filename)
-        self.Bottom_Frame(result_list,num_topic,name_topic)
+        # print(number_topic)
+
+        name_topic = self.Top_Frame(filename,number_topic)
+        self.Bottom_Frame(result_list,number_topic,name_topic)
 
         return
 
@@ -1536,11 +1538,11 @@ class MetricWindow():
 
         file_eval.close()
 
-        return list_result_eval
+        return list_result_eval,number_topic
 
-    def Top_Frame(self,filename):
+    def Top_Frame(self,filename,num_topic):
 
-        num_topic = self.Extract_Number_of_filename(filename)
+        # num_topic = self.Extract_Number_of_filename(filename)
 
         name_topic = self.NameTopic(num_topic)
         self.master.configure(background='white')
@@ -1559,7 +1561,7 @@ class MetricWindow():
 
 
         
-        return(num_topic,name_topic)
+        return(name_topic)
 
     def LegendFrame(self, num_topic,name_topic):
 
