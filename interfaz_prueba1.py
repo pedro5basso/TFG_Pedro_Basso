@@ -1494,8 +1494,6 @@ class MetricWindow():
 
         result_list,number_topic = self.ReadEvalFile(path_filename)
 
-        # print(number_topic)
-
         name_topic = self.Top_Frame(filename,number_topic)
         self.Bottom_Frame(result_list,number_topic,name_topic)
 
@@ -1542,21 +1540,16 @@ class MetricWindow():
 
     def Top_Frame(self,filename,num_topic):
 
-        # num_topic = self.Extract_Number_of_filename(filename)
-
         name_topic = self.NameTopic(num_topic)
         self.master.configure(background='white')
 
         lbl_filename = Label(self.master, text="FILE SELECTED: " + filename, style='Tit.TLabel')
-        # lbl_filename = Label(self.master, text="FILE SELECTED: " + filename)
         lbl_filename.grid(row=0,column=1)
 
         lbl_topic_info = Label(self.master, text="Topic "+num_topic + ": "+ name_topic,  style='Tit.TLabel' )
-        # lbl_topic_info = Label(self.master, text="Topic "+num_topic + ": "+ name_topic )
         lbl_topic_info.grid(row=0,column=2)
 
         Button_Legend = Button(self.master, text="Legend", style='U.TButton', command= lambda: self.LegendFrame(num_topic,name_topic))
-        # Button_Legend = Button(self.master, text="Legend", style='U.TButton')
         Button_Legend.grid(row=0,column=3)
 
 
@@ -1601,32 +1594,6 @@ class MetricWindow():
 
         return
 
-    def Extract_Number_of_filename(self, filename):
-
-        units = filename[-5]
-
-        try:
-            tens = filename[-6]
-            int_tens = int(tens)
-            num_topic = tens + units
-            aux_1_number = False
-        except:
-            ten_topics = ''
-            num_topic = units
-            aux_1_number = True
-
-        try:
-            hundreds = filename[-7]
-            int_hundreds = int(hundreds)
-            num_topic = hundreds + tens + units
-        except:
-            hundred = ''
-            if(aux_1_number):
-                num_topic =  units
-            else:
-                num_topic = tens + units
-
-        return(num_topic)
 
     def NameTopic(self, num_topic):
 
@@ -2013,8 +1980,6 @@ class MetricWindow():
                     sim_image = _pack_sim[1]
 
                     if(sim_image == '1'):
-
-                        # SetColorCluster(self,url_image,list_clus_belong_photos,Color_List):
 
                         bg_color_ = self.SetColorCluster(_pack_sim[0],list_dgt)
                         bg_color = bg_color_[0]
